@@ -9,7 +9,7 @@ CPU_6502::CPU_6502(const char* debugFilePath) {
 	m_debugFile.open(debugFilePath, std::ofstream::out);
 	
 	if (!m_debugFile.is_open()) {
-		fmt::print("Failed to open cpu.log file!");
+		fmt::print("Failed to open cpu.log file!\n");
 	}
 }
 

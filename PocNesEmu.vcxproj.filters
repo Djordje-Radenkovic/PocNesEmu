@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Bus">
       <UniqueIdentifier>{a5cae678-9825-46d5-bff4-95698062558b}</UniqueIdentifier>
     </Filter>
@@ -31,12 +27,6 @@
     </Filter>
     <Filter Include="Config">
       <UniqueIdentifier>{e7b6bbec-6a95-45c4-ad30-cd1fbaac60f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\boost">
-      <UniqueIdentifier>{07a66a40-3d41-4b11-b030-b26b2eb771ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\boost\filesystem">
-      <UniqueIdentifier>{3fcb1daf-e4ba-4a71-98c3-bf8adb881148}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -83,14 +73,8 @@
     <ClInclude Include="src\Config.h">
       <Filter>Config</Filter>
     </ClInclude>
-    <ClInclude Include="lib\boost\filesystem\src\error_handling.hpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\boost\filesystem\src\windows_file_codecvt.hpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\boost\filesystem\src\windows_tools.hpp">
-      <Filter>lib\boost\filesystem</Filter>
+    <ClInclude Include="src\filesystem.h">
+      <Filter>ROM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -113,35 +97,8 @@
     <ClCompile Include="lib\fmtlib\src\format.cc">
       <Filter>lib\fmtlib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\boost\filesystem\src\codecvt_error_category.cpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\boost\filesystem\src\directory.cpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\boost\filesystem\src\exception.cpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\boost\filesystem\src\operations.cpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\boost\filesystem\src\path.cpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\boost\filesystem\src\path_traits.cpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\boost\filesystem\src\portability.cpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\boost\filesystem\src\unique_path.cpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\boost\filesystem\src\utf8_codecvt_facet.cpp">
-      <Filter>lib\boost\filesystem</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\boost\filesystem\src\windows_file_codecvt.cpp">
-      <Filter>lib\boost\filesystem</Filter>
+    <ClCompile Include="src\filesystem.cpp">
+      <Filter>ROM</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

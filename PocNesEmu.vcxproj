@@ -19,13 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lib\boost\filesystem\src\error_handling.hpp" />
-    <ClInclude Include="lib\boost\filesystem\src\windows_file_codecvt.hpp" />
-    <ClInclude Include="lib\boost\filesystem\src\windows_tools.hpp" />
     <ClInclude Include="src\Bus.h" />
     <ClInclude Include="src\CPU_2A03.h" />
     <ClInclude Include="src\CPU_6502.h" />
     <ClInclude Include="src\Config.h" />
+    <ClInclude Include="src\filesystem.h" />
     <ClInclude Include="src\IBusMaster.h" />
     <ClInclude Include="src\IBusSlave.h" />
     <ClInclude Include="src\INesCartridge.h" />
@@ -39,22 +37,13 @@
     <ClInclude Include="src\PPU_2C02.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="lib\boost\filesystem\src\codecvt_error_category.cpp" />
-    <ClCompile Include="lib\boost\filesystem\src\directory.cpp" />
-    <ClCompile Include="lib\boost\filesystem\src\exception.cpp" />
-    <ClCompile Include="lib\boost\filesystem\src\operations.cpp" />
-    <ClCompile Include="lib\boost\filesystem\src\path.cpp" />
-    <ClCompile Include="lib\boost\filesystem\src\path_traits.cpp" />
-    <ClCompile Include="lib\boost\filesystem\src\portability.cpp" />
-    <ClCompile Include="lib\boost\filesystem\src\unique_path.cpp" />
-    <ClCompile Include="lib\boost\filesystem\src\utf8_codecvt_facet.cpp" />
-    <ClCompile Include="lib\boost\filesystem\src\windows_file_codecvt.cpp" />
     <ClCompile Include="lib\fmtlib\src\format.cc" />
     <ClCompile Include="lib\fmtlib\src\os.cc" />
     <ClCompile Include="src\CPU_6502.cpp" />
     <ClCompile Include="src\CPU_6502_AddressingModes.cpp" />
     <ClCompile Include="src\CPU_6502_Instructions.cpp" />
     <ClCompile Include="src\CPU_6502_LookupVector.cpp" />
+    <ClCompile Include="src\filesystem.cpp" />
     <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -135,7 +124,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib/boost/filesystem/include;$(SolutionDir)lib/fmtlib/include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib/fmtlib/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,7 +137,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib/boost/filesystem/include;$(SolutionDir)lib/fmtlib/include;$(ProjectDir)/lib/fmtlib/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib/fmtlib/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -165,7 +154,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib/boost/filesystem/include;$(SolutionDir)lib/fmtlib/include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib/fmtlib/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -183,7 +172,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib/boost/filesystem/include;$(SolutionDir)lib/fmtlib/include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib/fmtlib/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

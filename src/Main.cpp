@@ -2,11 +2,12 @@
 
 #include "fmt/printf.h"
 
+#include "Config.h"
+#include "filesystem.h"
 #include "NesCore.h"
 #include "CPU_6502.h"
 #include "NesArrayRam.h"
 #include "Bus.h"
-#include "Config.h"
 
 
 void runCPU_nCycles(INesCpu* cpu,size_t numCycles) {
@@ -25,7 +26,7 @@ void runCPU_nInstructions(INesCpu* cpu, size_t numInstructions) {
 	} while (numInstructions > 0);
 }
 
-void dump_memory(Bus<uint16_t, uint8_t>* bus, size_t startAddress = 0, size_t endAddress = 0xFFFF) {
+void dump_memory(Bus<uint16_t, uint8_t>* bus, size_t startAddress = 0, size_t endAddress = 0xFFFF) {	
 	std::ofstream memDumpFile(MEM_DUMP_FILE_PATH, std::ofstream::out);
 	if (!memDumpFile.is_open()) {
 		fmt::print("Failed to open memdump.log file!\n");
@@ -44,6 +45,11 @@ void dump_memory(Bus<uint16_t, uint8_t>* bus, size_t startAddress = 0, size_t en
 }
 
 int main(int argc, char** argv) {
+	// Create logs folder
+	if (!POCNES::dirExists(LOGS_FOLDER_PATH))
+		POCNES::makedir(LOGS_FOLDER_PATH);
+
+
 	// Create system components
 	INesCpu* cpu = new CPU_6502(DEBUG_FILE_PATH);
 	IRam<uint16_t, uint8_t>* mainMemory = new NesArrayRam(0x0800);
