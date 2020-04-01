@@ -16,5 +16,5 @@ public:
 	virtual size_t getCyclesPassed() = 0;
 
 	// Makes the interface not instantiable
-	virtual ~INesCpu() = 0 {};
+	virtual ~INesCpu() {};
 };

@@ -11,4 +11,6 @@ public:
 	virtual void connectBus(Bus<addressWidth, dataWidth>* bus) = 0;
 	virtual inline dataWidth read(addressWidth address) = 0;
 	virtual inline void write(addressWidth address, dataWidth data) = 0;
+
+	virtual ~IBusMaster() {}
 };

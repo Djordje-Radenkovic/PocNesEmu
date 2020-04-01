@@ -659,13 +659,13 @@ uint8_t CPU_6502::TYA() {
 // TODO: Separate the illegal opcodes into their own functions
 uint8_t CPU_6502::XXX() {
 	if (opcode == 0x32) {
-		printf_s(" JAM instruction");
+		fmt::print(" JAM instruction");
 		std::cin.get();
 
 		return 0;
 	}
 	
-	printf_s(" Illegal instruction");
+	fmt::print(" Illegal instruction");
 
 	return 0;
 }

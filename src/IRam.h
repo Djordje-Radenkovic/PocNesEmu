@@ -6,5 +6,5 @@ template <typename addressWidth, typename dataWidth>
 class IRam : public IBusSlave<addressWidth, dataWidth> {
 public:
 	// Makes the interface not instantiable
-	virtual ~IRam() = 0 {};
+	virtual ~IRam() {}
 };
