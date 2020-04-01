@@ -3,6 +3,8 @@
 #include <map>
 #include <limits>
 
+#include "fmt/printf.h"
+
 #include "IBusSlave.h"
 
 template <typename addressWidth, typename dataWidth>
@@ -52,13 +54,11 @@ public:
 		}
 
 		// Add new slave
-		printf_s("Added slave: $%04X-$%04X\n", (int)startAddressToAdd, startAddressToAdd + slaveToAdd->size() - 1);
+		fmt::printf("Added slave: $%04X-$%04X\n", (int)startAddressToAdd, startAddressToAdd + slaveToAdd->size() - 1);
 		m_slaves.insert(std::make_pair(slaveToAdd, startAddressToAdd));
 	}
 
 	IBusSlave<addressWidth, dataWidth>* getSlaveWithAddress(addressWidth address) {
-		// std::cout << "Checking slaves for address " << (int)address << std::endl;
-
 		// Check if address is in address space
 		if (address <= 0 || address > maxAddress) return nullptr;
 
@@ -66,7 +66,6 @@ public:
 		for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it) {
 			IBusSlave<addressWidth, dataWidth>* slave = it->first;
 			addressWidth startAddress = it->second;
-			// std::cout << "Checking slave: " << (int)startAddress << "-" << (int)startAddress + slave->size()-1 << std::endl;
 
 			if ((address >= startAddress) && (address <= (startAddress + slave->size()-1))) {
 				lastRetrievedStartAddress = startAddress;
@@ -83,7 +82,7 @@ public:
 		auto slave = getSlaveWithAddress(address);
 		if (slave == nullptr) {
 			if (log)
-				std::cout << "No slaves match the address " << (int)address << ". No write will happen." << std::endl;
+				fmt::printf("No slaves match the address %04X. No write will happen.", (int)address);
 			return;
 		}
 
@@ -95,11 +94,9 @@ public:
 		auto slave = getSlaveWithAddress(address);
 		if (slave == nullptr) {
 			if (log)
-				std::cout << "No slaves match the address " << (int)address << ". Read will return -1." << std::endl;
+				fmt::printf("No slaves match the address %04X. Read will return -1 (0xFF).", (int)address);
 			return -1;
 		}
-
-		// std::cout << "Reading from slave " << slave->size() << std::endl;
 
 		return slave->read(address - lastRetrievedStartAddress);
 	}

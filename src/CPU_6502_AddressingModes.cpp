@@ -1,15 +1,21 @@
+#include "fmt/format.h"
+#include "fmt/printf.h"
+#include "fmt/core.h"
+
 #include "CPU_6502.h"
 
 #define _DEBUG_LOG
 
 void CPU_6502::log() {
-	printf_s("\n%04X  %s   A:%02X X:%02X Y:%02X P:%02X SP:%02X PPU:%3d,%3d CYC:%d",
-		PC-1, debugBuffer, A, X, Y, PS.data, SP, 0, 0, totalCyclesPassed);
+	fmt::printf("\n%04X  %s   A:%02X X:%02X Y:%02X P:%02X SP:%02X PPU:%3d,%3d CYC:%d",
+		PC-1, debugBuffer.data(), A, X, Y, PS.data, SP, 0, 0, totalCyclesPassed);
 	
-	if (m_debugFile != nullptr) {
-		fprintf_s(m_debugFile, "\n%04X  %s    A:%02X X:%02X Y:%02X P:%02X SP:%02X PPU:%3d,%3d CYC:%d",
-			PC - 1, debugBuffer, A, X, Y, PS.data, SP, 0, 0, totalCyclesPassed);
+	if (m_debugFile.is_open()) {
+		fmt::fprintf(m_debugFile, "\n%04X  %s   A:%02X X:%02X Y:%02X P:%02X SP:%02X PPU:%3d,%3d CYC:%d",
+			PC - 1, debugBuffer.data(), A, X, Y, PS.data, SP, 0, 0, totalCyclesPassed);
 	}
+
+	debugBuffer.clear();
 }
 
 //	+-----------------------+
@@ -21,7 +27,7 @@ uint8_t CPU_6502::IMP() {
 	fetchedData = A;
 
 #ifdef _DEBUG_LOG
-	sprintf_s(debugBuffer, "%02X        %s                          ",
+	fmt::format_to(debugBuffer, "{:02X}        {:s}                          ",
 		opcode, currentInstructionName);
 	log();
 #endif
@@ -34,7 +40,7 @@ uint8_t CPU_6502::IMM() {
 	addressAbsolute = read(PC);
 
 #ifdef _DEBUG_LOG
-	sprintf_s(debugBuffer, "%02X %02X     %s #$%02X                     ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} #${:02X}                     ",
 		opcode, addressAbsolute, currentInstructionName, addressAbsolute);
 	log();
 #endif
@@ -50,7 +56,7 @@ uint8_t CPU_6502::ZP0() {
 	addressAbsolute &= 0x00FF;
 
 #ifdef _DEBUG_LOG
-	sprintf_s(debugBuffer, "%02X %02X     %s $%02X = %02X                 ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X} = {:02X}                 ",
 		opcode, addressAbsolute, currentInstructionName, addressAbsolute, read(addressAbsolute));
 	log();
 #endif
@@ -67,7 +73,7 @@ uint8_t CPU_6502::ZPX() {
 
 #ifdef _DEBUG_LOG
 	result = read(PC);
-	sprintf_s(debugBuffer, "%02X %02X     *%s $%02X,X @ %02X =  %02X       ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X}     *{:s} ${:02X},X @ {:02X} =  {:02X}       ",
 		opcode, result, currentInstructionName, result, addressAbsolute, read(addressAbsolute));
 	log();
 #endif
@@ -84,7 +90,7 @@ uint8_t CPU_6502::ZPY() {
 
 #ifdef _DEBUG_LOG
 	result = read(PC);
-	sprintf_s(debugBuffer, "%02X %02X     *%s $%02X,Y @ %02X =  %02X       ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X}     *{:s} ${:02X},Y @ {:02X} =  {:02X}       ",
 		opcode, result, currentInstructionName, result, addressAbsolute, read(addressAbsolute));
 	log();
 #endif
@@ -101,7 +107,7 @@ uint8_t CPU_6502::ABS() {
 	addressAbsolute = (hi << 8) | lo;
 
 #ifdef _DEBUG_LOG
-	sprintf_s(debugBuffer, "%02X %02X %02X  %s $%04X                    ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X}                    ",
 		opcode, lo, hi, currentInstructionName, addressAbsolute);
 	log();
 #endif
@@ -120,7 +126,7 @@ uint8_t CPU_6502::ABX() {
 
 #ifdef _DEBUG_LOG
 	result = (hi << 8) | lo;
-	sprintf_s(debugBuffer, "%02X %02X %02X  %s $%04X,X @ %04X = %02X      ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X},X @ {:04X} = {:02X}      ",
 		opcode, lo, hi, currentInstructionName, result,
 		addressAbsolute, read(addressAbsolute));
 	log();
@@ -143,7 +149,7 @@ uint8_t CPU_6502::ABY() {
 
 #ifdef _DEBUG_LOG
 	result = (hi << 8) | lo;
-	sprintf_s(debugBuffer, "%02X %02X %02X  %s $%04X,Y @ %04X = %02X      ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X},Y @ {:04X} = {:02X}      ",
 		opcode, lo, hi, currentInstructionName, result,
 		addressAbsolute, read(addressAbsolute));
 	log();
@@ -170,7 +176,7 @@ uint8_t CPU_6502::IND() {
 	// result = read(PC);
 	// addressAbsolute = read(PC + 1);
 	// addressRelative = (addressAbsolute << 8) | result;
-	sprintf_s(debugBuffer, "%02X %02X %02X  %s ($%04X) = %04X           ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} (${:04X}) = {:04X}           ",
 		opcode, ptrLo, ptrHi, currentInstructionName, addressAbsolute, read(addressAbsolute));
 	log();
 #endif
@@ -219,7 +225,7 @@ uint8_t CPU_6502::REL() {
 	// result = read(PC);
 	// addressAbsolute = read(PC + 1);
 	// addressRelative = addressAbsolute;
-	sprintf_s(debugBuffer, "%02X %02X     %s $%04X                    ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:04X}                    ",
 		opcode, read(PC), currentInstructionName, addressRelative);
 	log();
 #endif

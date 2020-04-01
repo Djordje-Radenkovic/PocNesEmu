@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <iostream>
+#include <fstream>
 
 #include "INesCpu.h"
 #include "IBusMaster.h"
@@ -99,7 +99,7 @@ private:
 	struct CpuInstruction;
 
 	char currentInstructionName[4];
-	char debugBuffer[100];
+	fmt::memory_buffer debugBuffer;
 	void log();
 	bool isIMP();
 
@@ -112,7 +112,7 @@ private:
 	uint8_t opcode = 0x00;
 	uint8_t cycles = 0;
 	size_t totalCyclesPassed = 0;
-	FILE* m_debugFile;
+	std::ofstream m_debugFile;
 
 	static std::vector<CpuInstruction> lookup;
 
@@ -120,7 +120,9 @@ public:
 	std::map<uint16_t, std::string> disassemble(uint16_t nStart, uint16_t nStop);
 
 	CPU_6502();
-	CPU_6502(FILE* debugFile);
+	CPU_6502(const char * debugFilePath);
+
+	~CPU_6502();
 
 	void connectBus(Bus<uint16_t, uint8_t>* bus) override;
 	bool isFinished() override;

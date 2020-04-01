@@ -1,11 +1,17 @@
 #include "CPU_6502.h"
 
+
 CPU_6502::CPU_6502() {
-	m_debugFile = nullptr;
+
 }
 
-CPU_6502::CPU_6502(FILE* debugFile) {
-	m_debugFile = debugFile;
+CPU_6502::CPU_6502(const char* debugFilePath) {
+	m_debugFile.open(debugFilePath, std::ofstream::out);
+}
+
+CPU_6502::~CPU_6502() {
+	m_debugFile.flush();
+	m_debugFile.close();
 }
 
 struct CPU_6502::CpuInstruction

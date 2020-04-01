@@ -23,6 +23,12 @@
     <Filter Include="APU">
       <UniqueIdentifier>{a7dd8597-332a-4270-a565-aa85bd1580d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lib">
+      <UniqueIdentifier>{1ac2b26e-a364-470b-9ae2-fcb310a8dea4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\fmtlib">
+      <UniqueIdentifier>{cb594be6-aec4-4d35-8b29-e592b460c352}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NesCore.h" />
@@ -79,6 +85,12 @@
     </ClCompile>
     <ClCompile Include="src\CPU_6502.cpp">
       <Filter>CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\fmtlib\src\os.cc">
+      <Filter>lib\fmtlib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\fmtlib\src\format.cc">
+      <Filter>lib\fmtlib</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
