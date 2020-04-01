@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Bus">
+      <UniqueIdentifier>{a5cae678-9825-46d5-bff4-95698062558b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CPU">
+      <UniqueIdentifier>{b97a99ee-6670-4e5e-b275-a2cd84f798fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ROM">
+      <UniqueIdentifier>{d8439c51-e5f7-4caf-8709-c5ca76b4e2da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RAM">
+      <UniqueIdentifier>{20951a36-204a-48c6-848f-59874a5171f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PPU">
+      <UniqueIdentifier>{ba055a80-5ead-4057-9630-3d2aae3312f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="APU">
+      <UniqueIdentifier>{a7dd8597-332a-4270-a565-aa85bd1580d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\NesCore.h" />
+    <ClInclude Include="src\Bus.h">
+      <Filter>Bus</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IBusMaster.h">
+      <Filter>Bus</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IBusSlave.h">
+      <Filter>Bus</Filter>
+    </ClInclude>
+    <ClInclude Include="src\INesCpu.h">
+      <Filter>CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CPU_6502.h">
+      <Filter>CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CPU_2A03.h">
+      <Filter>CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="src\INesRom.h">
+      <Filter>ROM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\INesCartridge.h">
+      <Filter>ROM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IRam.h">
+      <Filter>RAM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NesArrayRam.h">
+      <Filter>RAM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\INesPpu.h">
+      <Filter>PPU</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PPU_2C02.h">
+      <Filter>PPU</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NesApu.h">
+      <Filter>APU</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\CPU_6502_LookupVector.cpp">
+      <Filter>CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CPU_6502_Instructions.cpp">
+      <Filter>CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CPU_6502_AddressingModes.cpp">
+      <Filter>CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CPU_6502.cpp">
+      <Filter>CPU</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

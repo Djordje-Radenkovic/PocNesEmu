@@ -100,7 +100,7 @@ void CPU_6502::tick() {
 		
 		PS.XX = 1;
 		PS.DM = 0;
-		strcpy(currentInstructionName, (this->lookup[opcode].name.c_str()));
+		strcpy_s(currentInstructionName, (this->lookup[opcode].name.c_str()));
 
 		cycles = lookup[opcode].cycles;
 
