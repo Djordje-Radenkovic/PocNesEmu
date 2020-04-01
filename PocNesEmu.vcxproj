@@ -22,6 +22,7 @@
     <ClInclude Include="src\Bus.h" />
     <ClInclude Include="src\CPU_2A03.h" />
     <ClInclude Include="src\CPU_6502.h" />
+    <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\IBusMaster.h" />
     <ClInclude Include="src\IBusSlave.h" />
     <ClInclude Include="src\INesCartridge.h" />

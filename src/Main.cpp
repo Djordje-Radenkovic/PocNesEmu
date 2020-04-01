@@ -6,11 +6,7 @@
 #include "CPU_6502.h"
 #include "NesArrayRam.h"
 #include "Bus.h"
-
-
-#define DEBUG_FILE_PATH "C:\\Users\\Anic\\Desktop\\cpu.log"
-#define ROM_FILE_PATH "C:\\Users\\Anic\\Desktop\\nestest.nes"
-#define MEM_DUMP_FILE_PATH "C:\\Users\\Anic\\Desktop\\dump.mem"
+#include "Config.h"
 
 
 void runCPU_nCycles(INesCpu* cpu,size_t numCycles) {

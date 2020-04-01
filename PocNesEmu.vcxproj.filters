@@ -29,6 +29,9 @@
     <Filter Include="lib\fmtlib">
       <UniqueIdentifier>{cb594be6-aec4-4d35-8b29-e592b460c352}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{e7b6bbec-6a95-45c4-ad30-cd1fbaac60f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NesCore.h" />
@@ -70,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="src\NesApu.h">
       <Filter>APU</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Config.h">
+      <Filter>Config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
