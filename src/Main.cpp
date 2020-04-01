@@ -25,6 +25,23 @@ void runCPU_nInstructions(INesCpu* cpu, size_t numInstructions) {
 	} while (numInstructions > 0);
 }
 
+void dump_memory(Bus<uint16_t, uint8_t>* bus, size_t startAddress = 0, size_t endAddress = 0xFFFF) {
+	std::ofstream memDumpFile(MEM_DUMP_FILE_PATH, std::ofstream::out);
+	if (!memDumpFile.is_open()) {
+		fmt::print("Failed to open memdump.log file!\n");
+		return;
+	}
+
+	for (int i = 0; i <= 0xFFFF; i++) {
+		if (i % 0x10 == 0) {
+			fmt::fprintf(memDumpFile, "\n0x%04X: ", i);
+		}
+		fmt::fprintf(memDumpFile, "%02X ", bus->read(i, false, false));
+	}
+	memDumpFile.flush();
+	memDumpFile.close();
+	fmt::printf("Dumped memory to disk ($%04X-$%04X).\n", startAddress, endAddress);
+}
 
 int main(int argc, char** argv) {
 	// Create system components
@@ -82,25 +99,14 @@ int main(int argc, char** argv) {
 
 
 	// Debug memory dump
-	const uint16_t dumpStartAddress = 0x0000;
-	const uint16_t dumpEndAddress =	  0xFFFF;
+	dump_memory(bus);
 
-	std::ofstream memDumpFile(MEM_DUMP_FILE_PATH, std::ofstream::out);
-
-	for (int i = 0; i <= 0xFFFF; i++) {
-		if (i % 0x10 == 0) {
-			fmt::fprintf(memDumpFile, "\n0x%04X: ", i);
-		}
-		fmt::fprintf(memDumpFile, "%02X ", bus->read(i,false, false));
-	}
-	memDumpFile.flush();
-	memDumpFile.close();
-	fmt::printf("Dumped memory to disk ($%04X-$%04X).\n", dumpStartAddress, dumpEndAddress);
-
-
+	
 	// Write dummy reset vector
 	bus->write(0xFFFC, 0x00);
 	bus->write(0xFFFD, 0xC0);
+
+
 
 
 	// Run the CPU
