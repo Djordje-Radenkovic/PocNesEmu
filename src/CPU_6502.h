@@ -20,8 +20,8 @@
 #define highByte(value) (uint8_t)((value >> 8) & 0x00FF)
 
 #define checkZF(value) (PS.ZF = (value == 0x00))
-#define checkNF(value) (PS.NF = (value & 0x80))
-#define checkCF(value) (PS.CF = (value & 0x01))
+#define checkNF(value) (PS.NF = ((value & 0x80) >> 7))
+#define checkCF(value) (PS.CF = ((value & 0x100) >> 8))
 
 
 class CPU_6502 : public INesCpu, public IBusMaster<uint16_t, uint8_t> {
@@ -102,6 +102,7 @@ private:
 	fmt::memory_buffer debugBuffer;
 	void log();
 	bool isIMP();
+	bool isIMM();
 
 	uint8_t fetchData();
 	uint8_t fetchedData = 0x00;

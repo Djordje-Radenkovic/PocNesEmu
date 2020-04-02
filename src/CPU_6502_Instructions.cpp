@@ -14,7 +14,7 @@ uint8_t CPU_6502::ADC() {
 
 	PS.CF = (result > 0xFF);
 	checkZF(lowByte(result));
-	PS.OF = ((~((uint16_t)A ^ (uint16_t)fetchedData) & ((uint16_t)A ^ (uint16_t)result)) & 0x0080);
+	PS.OF = !(0 == ((~((uint16_t)A ^ (uint16_t)fetchedData) & ((uint16_t)A ^ (uint16_t)result)) & 0x0080));
 	checkNF(result);
 
 	A = lowByte(result);
@@ -40,9 +40,9 @@ uint8_t CPU_6502::ASL() {
 
 	result = (uint16_t)fetchedData << 1;
 
-	checkCF(highByte(result));
+	PS.CF = (result & 0xFF00) > 0;
 	checkZF(lowByte(result));
-	checkNF(result);
+	checkNF(lowByte(result));
 
 	if (isIMP())
 		A = lowByte(result);
@@ -104,8 +104,8 @@ uint8_t CPU_6502::BIT() {
 	result = A & fetchedData;
 
 	checkZF(lowByte(result));
-	PS.NF = (fetchedData & (1 << 7));
-	PS.OF = (fetchedData & (1 << 6));
+	PS.NF = (fetchedData & (1 << 7)) >> 7;
+	PS.OF = (fetchedData & (1 << 6)) >> 6;
 
 	return 0;
 }
@@ -405,7 +405,7 @@ uint8_t CPU_6502::LDY() {
 uint8_t CPU_6502::LSR() {
 	fetchData();
 
-	checkCF(fetchedData);
+	PS.CF = fetchedData & 0x0001;
 
 	result = fetchedData >> 1;
 
@@ -460,7 +460,12 @@ uint8_t CPU_6502::PHA() {
 
 // Push Processor Status
 uint8_t CPU_6502::PHP() {
+	PS.BC = 1;
+	PS.XX = 1;
 	push(PS.data);
+
+	PS.BC = 0;
+	PS.XX = 0;
 
 	return 0;
 }
@@ -479,6 +484,10 @@ uint8_t CPU_6502::PLA() {
 uint8_t CPU_6502::PLP() {
 	PS.data = pull();
 
+	PS.XX = 1;
+	PS.BC = 0;	// TODO: Verify if this should be here (kind of a hack)
+
+
 	return 0;
 }
 
@@ -488,7 +497,7 @@ uint8_t CPU_6502::ROL() {
 
 	result = (uint16_t)(fetchedData << 1) | PS.CF;
 
-	checkCF(result & 0xFF00);
+	checkCF(result);
 	checkZF(lowByte(result));
 	PS.NF = (result & 0x0080);
 
@@ -506,7 +515,7 @@ uint8_t CPU_6502::ROR() {
 
 	result = (uint16_t)(PS.CF << 7) | (fetchedData >> 1);
 
-	checkCF(fetchedData);
+	PS.CF = fetchedData & 0x01;
 	checkZF(lowByte(result));
 	PS.NF = (result & 0x0080);
 
@@ -546,10 +555,10 @@ uint8_t CPU_6502::SBC() {
 
 	result = (uint16_t)A + ((uint16_t)fetchedData ^ 0x00FF) + (uint16_t)PS.CF;
 
-	PS.CF = (result & 0xFF00);
+	PS.CF = (result > 0xFF);
 	checkZF(lowByte(result));
-	PS.OF = ((result ^ (uint16_t)A) & (result ^ ((uint16_t)fetchedData ^ 0x00FF)) & 0x0080);
-	checkNF(result);
+	PS.OF = !(0 == ((result ^ (uint16_t)A) & (result ^ ((uint16_t)fetchedData ^ 0x00FF)) & 0x0080));
+	checkNF(lowByte(result));
 
 	A = lowByte(result);
 
@@ -633,6 +642,7 @@ uint8_t CPU_6502::TXA() {
 	A = X;
 
 	checkZF(A);
+	checkNF(A);
 
 	return 0;
 }

@@ -102,17 +102,15 @@ int main(int argc, char** argv) {
 		bus->write(otherAddress + i, memblock[romOffset + i]);
 	}
 	fmt::print("NESTest ROM loaded into memory.\n");
-
-
-	// Debug memory dump
-	dump_memory(bus);
-
 	
+
 	// Write dummy reset vector
 	bus->write(0xFFFC, 0x00);
 	bus->write(0xFFFD, 0xC0);
 
 
+	// Debug memory dump
+	dump_memory(bus);
 
 
 	// Run the CPU

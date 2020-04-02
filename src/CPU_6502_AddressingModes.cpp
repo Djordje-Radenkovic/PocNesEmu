@@ -6,6 +6,7 @@
 
 #define _DEBUG_LOG
 
+#ifdef _DEBUG_LOG
 void CPU_6502::log() {
 	fmt::printf("\n%04X  %s   A:%02X X:%02X Y:%02X P:%02X SP:%02X PPU:%3d,%3d CYC:%d",
 		PC-1, debugBuffer.data(), A, X, Y, PS.data, SP, 0, 0, totalCyclesPassed);
@@ -17,6 +18,7 @@ void CPU_6502::log() {
 
 	debugBuffer.clear();
 }
+#endif
 
 //	+-----------------------+
 //	|	Addressing Modes	|
@@ -27,8 +29,14 @@ uint8_t CPU_6502::IMP() {
 	fetchedData = A;
 
 #ifdef _DEBUG_LOG
-	fmt::format_to(debugBuffer, "{:02X}        {:s}                          ",
-		opcode, currentInstructionName);
+	if (opcode == 0x4A || opcode == 0x0A || opcode == 0x6A) {
+		fmt::format_to(debugBuffer, "{:02X}        {:s} A                        ",
+			opcode, currentInstructionName);
+	}
+	else {
+		fmt::format_to(debugBuffer, "{:02X}        {:s}                          ",
+			opcode, currentInstructionName);
+	}
 	log();
 #endif
 
@@ -107,9 +115,16 @@ uint8_t CPU_6502::ABS() {
 	addressAbsolute = (hi << 8) | lo;
 
 #ifdef _DEBUG_LOG
-	fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X}                    ",
-		opcode, lo, hi, currentInstructionName, addressAbsolute);
-	log();
+	if (opcode ==  0x4C || opcode == 0x20) {
+		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X}                    ",
+			opcode, lo, hi, currentInstructionName, addressAbsolute);
+		log();
+	}
+	else {
+		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X} = {:02X}               ",
+			opcode, lo, hi, currentInstructionName, addressAbsolute, read(addressAbsolute));
+		log();
+	}
 #endif
 
 	PC += 2;
@@ -222,11 +237,8 @@ uint8_t CPU_6502::REL() {
 		addressRelative |= 0xFF00;
 
 #ifdef _DEBUG_LOG
-	// result = read(PC);
-	// addressAbsolute = read(PC + 1);
-	// addressRelative = addressAbsolute;
 	fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:04X}                    ",
-		opcode, read(PC), currentInstructionName, addressRelative);
+		opcode, read(PC), currentInstructionName, PC+1 + addressRelative);
 	log();
 #endif
 

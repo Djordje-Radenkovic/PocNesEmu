@@ -34,9 +34,16 @@ bool CPU_6502::isIMP() {
 	return (lookup[opcode].addressMode == &CPU_6502::IMP);
 }
 
+bool CPU_6502::isIMM() {
+	return (lookup[opcode].addressMode == &CPU_6502::IMM);
+}
+
 uint8_t CPU_6502::fetchData() {
-	if (!(lookup[opcode].addressMode == &CPU_6502::IMP))
+	if (!isIMP())
 		fetchedData = read(addressAbsolute);
+
+	if (isIMM())
+		fetchedData = addressAbsolute;
 
 	return fetchedData;
 }
@@ -109,7 +116,7 @@ void CPU_6502::tick() {
 		opcode = read(PC++);
 		
 		PS.XX = 1;
-		PS.DM = 0;
+
 		(this->lookup[opcode].name).copy(currentInstructionName, sizeof currentInstructionName);
 
 		cycles = lookup[opcode].cycles;
@@ -118,6 +125,8 @@ void CPU_6502::tick() {
 		uint8_t additionalCycle2 = (this->*lookup[opcode].operation)();
 
 		cycles += (additionalCycle1 & additionalCycle2);
+
+		PS.XX = 1;
 	}
 
 	totalCyclesPassed++;

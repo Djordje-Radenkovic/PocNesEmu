@@ -60,7 +60,7 @@ public:
 
 	IBusSlave<addressWidth, dataWidth>* getSlaveWithAddress(addressWidth address) {
 		// Check if address is in address space
-		if (address <= 0 || address > maxAddress) return nullptr;
+		if (address < 0 || address > maxAddress) return nullptr;
 
 		// Find slave that occupies the address and return it
 		for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it) {
