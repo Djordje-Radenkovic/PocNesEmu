@@ -79,7 +79,10 @@ private:
 	uint8_t STX();	uint8_t STY();	uint8_t TAX();	uint8_t TAY();
 	uint8_t TSX();	uint8_t TXA();	uint8_t TXS();	uint8_t TYA();
 
-	uint8_t XXX(); // Illegal instructions
+	// Illegal opcodes
+	uint8_t LAX();	uint8_t SAX();	uint8_t DCP();
+
+	uint8_t XXX(); // Unknown opcodes
 
 	//			+--------------------+
 	//			|  Bus Functionality |

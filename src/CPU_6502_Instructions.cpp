@@ -134,7 +134,7 @@ uint8_t CPU_6502::BNE() {
 		if (highByte(addressAbsolute) != highByte(PC))
 			cycles++;
 
-		PC = addressAbsolute;
+		PC = addressAbsolute & 0xFFFF;
 	}
 
 	return 0;
@@ -676,8 +676,48 @@ uint8_t CPU_6502::TYA() {
 	return 0;
 }
 
-// Illegal instructions
-// TODO: Separate the illegal opcodes into their own functions
+
+//	+-------------------------------+
+//	|	  Illegal Instructions		|
+//	+-------------------------------+
+
+
+// Load Acumulator and X Register
+uint8_t CPU_6502::LAX() {
+	fetchData();
+
+	A = fetchedData;
+	X = fetchedData;
+
+	checkZF(A);
+	checkNF(A);
+
+	return 1;
+}
+
+// Store Acumulator AND X Register
+uint8_t CPU_6502::SAX() {
+	write(addressAbsolute, A & X);
+
+	return 0;
+}
+
+// Decrement Memory and Acumulator
+uint8_t CPU_6502::DCP() {
+	result = lowByte(read(addressAbsolute) - 1);
+
+	write(addressAbsolute, result);
+
+	result = (uint16_t)A - (uint16_t)result;
+
+	PS.CF = (A >= result);
+	checkZF(lowByte(result));
+	checkNF(lowByte(result));
+
+	return 0;
+}
+
+// Unknown instructions
 uint8_t CPU_6502::XXX() {
 	if (opcode == 0x32) {
 		fmt::print(" JAM instruction");
@@ -686,7 +726,7 @@ uint8_t CPU_6502::XXX() {
 		return 0;
 	}
 	
-	fmt::print(" Illegal instruction");
+	fmt::print(" Unknown instruction");
 
 	return 0;
 }
