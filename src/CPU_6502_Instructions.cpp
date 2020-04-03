@@ -318,10 +318,20 @@ uint8_t CPU_6502::EOR() {
 
 // Increment Memory
 uint8_t CPU_6502::INC() {
-	if (isIMP())
+	if (isIMP()) {
 		A++;
-	else
-		write(addressAbsolute, lowByte(read(addressAbsolute) + 1));
+
+		checkZF(A);
+		checkNF(A);
+	}
+	else {
+		result = lowByte(read(addressAbsolute) + 1);
+
+		write(addressAbsolute, result);
+
+		checkZF(result);
+		checkNF(result);
+	}
 
 	return 0;
 }
@@ -499,7 +509,7 @@ uint8_t CPU_6502::ROL() {
 
 	checkCF(result);
 	checkZF(lowByte(result));
-	PS.NF = (result & 0x0080);
+	checkNF(lowByte(result));
 
 	if (isIMP())
 		A = lowByte(result);
@@ -517,7 +527,7 @@ uint8_t CPU_6502::ROR() {
 
 	PS.CF = fetchedData & 0x01;
 	checkZF(lowByte(result));
-	PS.NF = (result & 0x0080);
+	checkNF(lowByte(result));
 
 	if (isIMP())
 		A = lowByte(result);

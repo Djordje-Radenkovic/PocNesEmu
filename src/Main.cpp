@@ -109,13 +109,13 @@ int main(int argc, char** argv) {
 	bus->write(0xFFFD, 0xC0);
 
 
-	// Debug memory dump
-	dump_memory(bus);
-
-
 	// Run the CPU
 	// runCPU_nInstructions(cpu, 5);
 	runCPU_nCycles(cpu, 26554);		// NESTest runs for 26554 cycles
+
+
+	// Debug memory dump
+	dump_memory(bus);
 
 
 	return 0;
