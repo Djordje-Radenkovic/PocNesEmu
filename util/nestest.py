@@ -1,4 +1,5 @@
 import os
+import sys
 
 
 sep = 85 * '-' + '\n'
@@ -14,8 +15,15 @@ def remove_ppu(l):
     return temp
 
 
+def clear():
+    if sys.platform == "win32":
+        os.system("cls")
+    else:
+        os.system("clear")
+
+
 def diff(f1, f2, up_to=-1):
-    os.system("clear")
+    clear()
 
     cmdd = ''
     prom = "> "
@@ -36,7 +44,7 @@ def diff(f1, f2, up_to=-1):
             print("My log\n" + sep + mine, end='')
             print(sep, end='')
             
-            cmdd = input(prom)
+            cmdd = input(prom).lower()
             while True:
                 if cmdd == "exit" or cmdd == "quit":
                     return
@@ -54,11 +62,16 @@ def diff(f1, f2, up_to=-1):
                 if cmdd == "clear" or cmdd == "cls":
                     os.system("clear")
 
-                cmdd = input(prom)
+                cmdd = input(prom).lower()
 
 def main():
+    start_dir = os.path.dirname(sys.argv[0])
+    print(start_dir)
 
-    logs_dir = "../logs"
+    if (start_dir != ""):
+        logs_dir = "logs"
+    else:
+        logs_dir = "../logs"
 
     golden_log = remove_ppu(list(open(os.path.join(logs_dir, "nestest.log"), "r")))
     my_log = remove_ppu(list(open(os.path.join(logs_dir, "cpu.log"), "r"))[1:])

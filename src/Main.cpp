@@ -115,6 +115,7 @@ int main(int argc, char** argv) {
 
 
 	// Debug memory dump
+	fmt::print("\n");
 	dump_memory(bus);
 
 
