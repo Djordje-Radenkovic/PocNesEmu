@@ -76,7 +76,8 @@ uint8_t CPU_6502::ZP0() {
 
 #ifdef _DEBUG_LOG
 	if (opcode == 0x04 || opcode == 0x44 || opcode == 0x64 || opcode == 0xA7 || opcode == 0x87 ||
-		opcode == 0xC7) {
+		opcode == 0xC7 || opcode == 0xE7 || opcode == 0x07 || opcode == 0x27 || opcode == 0x47 ||
+		opcode == 0x67) {
 	result = read(PC);
 
 	fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} ${:02X} = {:02X}                  ",
@@ -102,7 +103,8 @@ uint8_t CPU_6502::ZPX() {
 #ifdef _DEBUG_LOG
 	result = read(PC);
 	if (opcode == 0x14 || opcode == 0x34 || opcode == 0x54 || opcode == 0x74 ||
-		opcode == 0xD4 || opcode == 0xF4 || opcode == 0xD7) {
+		opcode == 0xD4 || opcode == 0xF4 || opcode == 0xD7 || opcode == 0xF7 ||
+		opcode == 0x17 || opcode == 0x37 || opcode == 0x57 || opcode == 0x77) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} ${:02X},X @ {:02X} = {:02X}        ",
 			opcode, result, currentInstructionName, result, addressAbsolute, read(addressAbsolute));
 	}
@@ -149,13 +151,15 @@ uint8_t CPU_6502::ABS() {
 	addressAbsolute = (hi << 8) | lo;
 
 #ifdef _DEBUG_LOG
-	if (opcode ==  0x4C || opcode == 0x20) {
-		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X}                     ",
-			opcode, lo, hi, currentInstructionName, addressAbsolute);
-	}
-	else if (opcode == 0x0C || opcode == 0xAF || opcode == 0x8F || opcode == 0xCF) {
+	if (opcode == 0x0C || opcode == 0xAF || opcode == 0x8F || opcode == 0xCF ||
+		opcode == 0xEF || opcode == 0x0F || opcode == 0x2F || opcode == 0x4F ||
+		opcode == 0x6F) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X} *{:s} ${:04X} = {:02X}                ",
 			opcode, lo, hi, currentInstructionName, addressAbsolute, read(addressAbsolute));
+	}
+	else if (opcode ==  0x4C || opcode == 0x20) {
+		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X}                     ",
+			opcode, lo, hi, currentInstructionName, addressAbsolute);
 	}
 	else {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X} = {:02X}                ",
@@ -180,7 +184,8 @@ uint8_t CPU_6502::ABX() {
 	result = (hi << 8) | lo;
 
 	if (opcode == 0x1C || opcode == 0x3C || opcode == 0x5C || opcode == 0x7C || opcode == 0xDC ||
-		opcode == 0xFC || opcode == 0xDF) {
+		opcode == 0xFC || opcode == 0xDF || opcode == 0xFF || opcode == 0x1F || opcode == 0x3F ||
+		opcode == 0x5F || opcode == 0x7F) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X} *{:s} ${:04X},X @ {:04X} = {:02X}       ",
 			opcode, lo, hi, currentInstructionName, result,
 			addressAbsolute, read(addressAbsolute));
@@ -211,7 +216,8 @@ uint8_t CPU_6502::ABY() {
 #ifdef _DEBUG_LOG
 	result = (hi << 8) | lo;
 
-	if (opcode == 0xBF || opcode == 0xDB) {
+	if (opcode == 0xBF || opcode == 0xDB || opcode == 0xFB || opcode == 0x1B || opcode == 0x3B ||
+		opcode == 0x5B || opcode == 0x7B) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X} *{:s} ${:04X},Y @ {:04X} = {:02X}       ",
 			opcode, lo, hi, currentInstructionName, result, addressAbsolute, read(addressAbsolute));
 	}
@@ -266,7 +272,8 @@ uint8_t CPU_6502::IZX() {
 	addressAbsolute = (hi << 8) | lo;
 
 #ifdef _DEBUG_LOG
-	if (opcode == 0xA3 || opcode == 0x83 || opcode == 0xC3) {
+	if (opcode == 0xA3 || opcode == 0x83 || opcode == 0xC3 || opcode == 0xE3 || opcode == 0x03 ||
+		opcode == 0x23 || opcode == 0x43 || opcode == 0x63) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} (${:02X},X) @ {:02X} = {:04X} = {:02X}  ",
 			opcode, result, currentInstructionName, result, lowByte(result + X), addressAbsolute, read(addressAbsolute));
 	}
@@ -291,7 +298,8 @@ uint8_t CPU_6502::IZY() {
 	addressAbsolute = (hi << 8) | lo;
 
 #ifdef _DEBUG_LOG
-	if (opcode == 0xA3 || opcode == 0xB3 || opcode == 0xD3) {
+	if (opcode == 0xA3 || opcode == 0xB3 || opcode == 0xD3 || opcode == 0xF3 || opcode == 0x13 || opcode == 0x33 ||
+		opcode == 0x53 || opcode == 0x73) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} (${:02X}),Y = {:04X} @ {:04X} = {:02X}",
 			opcode, result, currentInstructionName, result, addressAbsolute, (addressAbsolute + Y) & 0xFFFF, read((addressAbsolute + Y) & 0xFFFF));
 	}

@@ -22,61 +22,69 @@ def clear():
         os.system("clear")
 
 
-def diff(f1, f2, up_to=-1):
+def print_diff(line1, line2, line_num):
     clear()
+    print(sep, end='')
+    print("\t\t\tDifference in Line [" + str(line_num) + "]")
+    print(sep, end='')
+    print("Golden log\n" + sep + line1, end='')
+    print(sep, end='')
+    print("My log\n" + sep + line2, end='')
+    print(sep, end='')
+
+
+def print_help():
+    print("Commands: exit/quit; next; prev; goto <line number>; clear/cls; help/?")
+
+
+def diff(f1, f2):
+    passed = True
 
     cmdd = ''
     prom = "> "
 
     for line_num, (gold, mine) in enumerate(zip(f1, f2)):
-        if up_to != -1:
-            if line_num < up_to:
-                continue
-
-        up_to = -1
-
         if gold != mine:
-            print(sep, end='')
-            print("\t\t\tDifference in Line [" + str(line_num) + "]")
-            print(sep, end='')
-            print("Golden log\n" + sep + gold, end='')
-            print(sep, end='')
-            print("My log\n" + sep + mine, end='')
-            print(sep, end='')
+            passed = False
+            print_diff(gold, mine, line_num)
             
             cmdd = input(prom).lower()
             while True:
                 if cmdd == "exit" or cmdd == "quit":
+                    clear()
                     return
                 if cmdd == "next":
-                    os.system("clear")
-                    break
-                if cmdd.startswith("prev"):
-                    os.system("clear")
-                    diff(f1, f2, up_to=line_num-1)
-                    return
+                    line_num += 1
+                    print_diff(f1[line_num], f2[line_num], line_num)
+                if cmdd.startswith("prev"):                    
+                    line_num -= 1
+                    print_diff(f1[line_num], f2[line_num], line_num)
                 if cmdd.startswith("goto"):
-                    os.system("clear")
-                    diff(f1, f2, up_to=int(cmdd.split(' ')[1]))
-                    return
+                    line_num = int(cmdd.split(' ')[1])
+                    print_diff(f1[line_num], f2[line_num], line_num)
                 if cmdd == "clear" or cmdd == "cls":
-                    os.system("clear")
+                    clear()
+                if cmdd == "help" or cmdd == "?":
+                    print_help()
 
                 cmdd = input(prom).lower()
+    
+    return passed
+
 
 def main():
     start_dir = os.path.dirname(sys.argv[0])
-    print(start_dir)
 
     if (start_dir != ""):
         logs_dir = "logs"
     else:
         logs_dir = "../logs"
 
-    golden_log = remove_ppu(list(open(os.path.join(logs_dir, "nestest.log"), "r")))
+    golden_log = remove_ppu(list(open(os.path.join(logs_dir, "nestest.log"), "r"))[:-1])
     my_log = remove_ppu(list(open(os.path.join(logs_dir, "cpu.log"), "r"))[1:])
 
-    diff(golden_log, my_log)
+    if diff(golden_log, my_log):
+        print("PASS")
 
 
 if __name__ == "__main__" :

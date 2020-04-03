@@ -682,7 +682,7 @@ uint8_t CPU_6502::TYA() {
 //	+-------------------------------+
 
 
-// Load Acumulator and X Register
+// Load Accumulator and X Register
 uint8_t CPU_6502::LAX() {
 	fetchData();
 
@@ -695,14 +695,14 @@ uint8_t CPU_6502::LAX() {
 	return 1;
 }
 
-// Store Acumulator AND X Register
+// Store Accumulator AND X Register
 uint8_t CPU_6502::SAX() {
 	write(addressAbsolute, A & X);
 
 	return 0;
 }
 
-// Decrement Memory and Acumulator
+// Decrement Memory and Accumulator
 uint8_t CPU_6502::DCP() {
 	result = lowByte(read(addressAbsolute) - 1);
 
@@ -717,7 +717,94 @@ uint8_t CPU_6502::DCP() {
 	return 0;
 }
 
-// Unknown instructions
+// Increment Memory and Subtract Memory from Accumulator
+uint8_t CPU_6502::ISB() {
+	result = lowByte(read(addressAbsolute) + 1);
+
+	write(addressAbsolute, result);
+
+	result = (uint16_t)A + ((uint16_t)read(addressAbsolute) ^ 0x00FF) + (uint16_t)PS.CF;
+
+	PS.CF = (result > 0xFF);
+	checkZF(lowByte(result));
+	PS.OF = !(0 == ((result ^ (uint16_t)A) & (result ^ ((uint16_t)read(addressAbsolute) ^ 0x00FF)) & 0x0080));
+	checkNF(lowByte(result));
+
+	A = lowByte(result);
+
+	return 0;
+}
+
+// Shift Left and OR Accumulator with Memory
+uint8_t CPU_6502::SLO() {
+	fetchData();
+
+	result = (uint16_t)fetchedData << 1;
+	A |= lowByte(result);
+
+	write(addressAbsolute, lowByte(result));
+
+	PS.CF = (result > 0xFF);
+	checkZF(A);
+	checkNF(A);
+
+	return 0;
+}
+
+// Rotate Left and AND Accumulator with Memory
+uint8_t CPU_6502::RLA() {
+	fetchData();
+
+	result = ((uint16_t)fetchedData << 1) + (uint16_t)PS.CF;
+	A &= lowByte(result);
+
+	write(addressAbsolute, lowByte(result));
+
+	PS.CF = (result > 0xFF);
+	checkZF(A);
+	checkNF(A);
+
+	return 0;
+}
+
+// Shift Right and XOR Accumulator with Memory
+uint8_t CPU_6502::SRE() {
+	fetchData();
+
+	result = fetchedData >> 1;
+	A ^= result;
+
+	write(addressAbsolute, result);
+
+	PS.CF = (fetchedData & 0x01);
+	checkZF(A);
+	checkNF(A);
+
+	return 0;
+}
+
+// Rotate Right and ADC Accumulator with Memory
+uint8_t CPU_6502::RRA() {
+	fetchData();
+
+	addressRelative = (fetchedData >> 1) ^ (PS.CF << 7);
+	write(addressAbsolute, addressRelative);
+
+	PS.CF = (fetchedData & 1);
+
+	result = (uint16_t)A + (uint16_t)addressRelative + (uint16_t)PS.CF;
+
+	PS.CF = (result > 0xFF);
+	checkZF(lowByte(result));
+	PS.OF = !(0 == ((~((uint16_t)A ^ (uint16_t)addressRelative) & ((uint16_t)A ^ (uint16_t)result)) & 0x0080));
+	checkNF(result);
+
+	A = lowByte(result);
+
+	return 0;
+}
+
+// Unknown Instructions
 uint8_t CPU_6502::XXX() {
 	if (opcode == 0x32) {
 		fmt::print(" JAM instruction");

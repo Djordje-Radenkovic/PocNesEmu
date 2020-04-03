@@ -14,7 +14,7 @@ void runCPU_nCycles(INesCpu* cpu,size_t numCycles) {
 	cpu->reset();
 	do {
 		cpu->tick();
-	} while (cpu->getCyclesPassed() < numCycles);
+	} while (cpu->getCyclesPassed() <= numCycles);
 }
 
 void runCPU_nInstructions(INesCpu* cpu, size_t numInstructions) {
