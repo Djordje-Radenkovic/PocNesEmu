@@ -45,11 +45,11 @@ uint8_t CPU_6502::IMP() {
 
 // Immediate
 uint8_t CPU_6502::IMM() {
-	addressAbsolute = read(PC);
+	addressAbsolute = PC;
 
 #ifdef _DEBUG_LOG
 	fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} #${:02X}                      ",
-		opcode, addressAbsolute, currentInstructionName, addressAbsolute);
+		opcode, read(addressAbsolute), currentInstructionName, read(addressAbsolute));
 	log();
 #endif
 
@@ -64,8 +64,16 @@ uint8_t CPU_6502::ZP0() {
 	addressAbsolute &= 0x00FF;
 
 #ifdef _DEBUG_LOG
-	fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X} = {:02X}                  ",
-		opcode, addressAbsolute, currentInstructionName, addressAbsolute, read(addressAbsolute));
+	if (opcode == 0x04) {
+	result = read(PC);
+
+	fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} ${:02X} = {:02X}                  ",
+		opcode, result, currentInstructionName, result, read(result));
+	}
+	else {
+		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X} = {:02X}                  ",
+			opcode, addressAbsolute, currentInstructionName, addressAbsolute, read(addressAbsolute));
+	}
 	log();
 #endif
 
@@ -81,7 +89,7 @@ uint8_t CPU_6502::ZPX() {
 
 #ifdef _DEBUG_LOG
 	result = read(PC);
-	fmt::format_to(debugBuffer, "{:02X} {:02X}     *{:s} ${:02X},X @ {:02X} =  {:02X}        ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X},X @ {:02X} = {:02X}        ",
 		opcode, result, currentInstructionName, result, addressAbsolute, read(addressAbsolute));
 	log();
 #endif
@@ -98,7 +106,7 @@ uint8_t CPU_6502::ZPY() {
 
 #ifdef _DEBUG_LOG
 	result = read(PC);
-	fmt::format_to(debugBuffer, "{:02X} {:02X}     *{:s} ${:02X},Y @ {:02X} =  {:02X}        ",
+	fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X},Y @ {:02X} = {:02X}        ",
 		opcode, result, currentInstructionName, result, addressAbsolute, read(addressAbsolute));
 	log();
 #endif
@@ -184,7 +192,15 @@ uint8_t CPU_6502::IND() {
 	uint16_t ptrHi = read(PC+1);
 	uint16_t ptr = (ptrHi << 8) | ptrLo;
 
-	addressAbsolute = (read(ptr + 1) << 8) | read(ptr);
+
+	if (ptrLo == 0x00FF) // Simulate page boundary hardware bug
+	{
+		addressAbsolute = (read(ptrHi << 8) << 8) | read(ptr);
+	}
+	else // Behave normally
+	{
+		addressAbsolute = (read(ptr + 1) << 8) | read(ptr);
+	}
 
 #ifdef _DEBUG_LOG
 	fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} (${:04X}) = {:04X}            ",

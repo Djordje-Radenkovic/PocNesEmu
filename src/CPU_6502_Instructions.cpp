@@ -436,6 +436,7 @@ uint8_t CPU_6502::NOP() {
 	// https://wiki.nesdev.com/w/index.php/CPU_unofficial_opcodes
 
 	switch (opcode) {
+	case 0x04:
 	case 0x1C:
 	case 0x3C:
 	case 0x5C:
