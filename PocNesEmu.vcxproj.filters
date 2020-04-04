@@ -61,9 +61,6 @@
     <ClInclude Include="src\NesArrayRam.h">
       <Filter>RAM</Filter>
     </ClInclude>
-    <ClInclude Include="src\INesPpu.h">
-      <Filter>PPU</Filter>
-    </ClInclude>
     <ClInclude Include="src\PPU_2C02.h">
       <Filter>PPU</Filter>
     </ClInclude>
@@ -75,6 +72,9 @@
     </ClInclude>
     <ClInclude Include="src\filesystem.h">
       <Filter>ROM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\INesPpu.h">
+      <Filter>PPU</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +99,10 @@
     </ClCompile>
     <ClCompile Include="src\filesystem.cpp">
       <Filter>ROM</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NesCore.cpp" />
+    <ClCompile Include="src\PPU_2C02.cpp">
+      <Filter>PPU</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

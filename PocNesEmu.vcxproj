@@ -45,6 +45,8 @@
     <ClCompile Include="src\CPU_6502_LookupVector.cpp" />
     <ClCompile Include="src\filesystem.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\NesCore.cpp" />
+    <ClCompile Include="src\PPU_2C02.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

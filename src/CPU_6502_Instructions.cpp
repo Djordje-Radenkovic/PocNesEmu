@@ -47,7 +47,7 @@ uint8_t CPU_6502::ASL() {
 	if (isIMP())
 		A = lowByte(result);
 	else
-		write(addressAbsolute, lowByte(result));
+		writeTo(addressAbsolute, lowByte(result));
 
 	return 0;
 }
@@ -169,7 +169,7 @@ uint8_t CPU_6502::BRK() {
 
 	PS.BC = 0;
 
-	PC = (uint16_t)read(irqVectorLow) | ((uint16_t)read(irqVectorHigh) << 8);
+	PC = (uint16_t)readFrom(irqVectorLow) | ((uint16_t)readFrom(irqVectorHigh) << 8);
 
 	return 0;
 }
@@ -274,9 +274,9 @@ uint8_t CPU_6502::CPY() {
 
 // Decrement Memory
 uint8_t CPU_6502::DEC() {
-	result = lowByte(read(addressAbsolute) - 1);
+	result = lowByte(readFrom(addressAbsolute) - 1);
 
-	write(addressAbsolute, result);
+	writeTo(addressAbsolute, result);
 
 	checkZF(result);
 	checkNF(result);
@@ -325,9 +325,9 @@ uint8_t CPU_6502::INC() {
 		checkNF(A);
 	}
 	else {
-		result = lowByte(read(addressAbsolute) + 1);
+		result = lowByte(readFrom(addressAbsolute) + 1);
 
-		write(addressAbsolute, result);
+		writeTo(addressAbsolute, result);
 
 		checkZF(result);
 		checkNF(result);
@@ -425,7 +425,7 @@ uint8_t CPU_6502::LSR() {
 	if (isIMP())
 		A = lowByte(result);
 	else
-		write(addressAbsolute, lowByte(result));
+		writeTo(addressAbsolute, lowByte(result));
 
 	return 0;
 }
@@ -515,7 +515,7 @@ uint8_t CPU_6502::ROL() {
 	if (isIMP())
 		A = lowByte(result);
 	else
-		write(addressAbsolute, lowByte(result));
+		writeTo(addressAbsolute, lowByte(result));
 
 	return 0;
 }
@@ -533,7 +533,7 @@ uint8_t CPU_6502::ROR() {
 	if (isIMP())
 		A = lowByte(result);
 	else
-		write(addressAbsolute, lowByte(result));
+		writeTo(addressAbsolute, lowByte(result));
 
 	return 0;
 }
@@ -599,21 +599,21 @@ uint8_t CPU_6502::SEI() {
 
 // Store Accumulator
 uint8_t CPU_6502::STA() {
-	write(addressAbsolute, A);
+	writeTo(addressAbsolute, A);
 
 	return 0;
 }
 
 // Store X Register
 uint8_t CPU_6502::STX() {
-	write(addressAbsolute, X);
+	writeTo(addressAbsolute, X);
 
 	return 0;
 }
 
 // Store Y Register
 uint8_t CPU_6502::STY() {
-	write(addressAbsolute, Y);
+	writeTo(addressAbsolute, Y);
 
 	return 0;
 }
@@ -697,16 +697,16 @@ uint8_t CPU_6502::LAX() {
 
 // Store Accumulator AND X Register
 uint8_t CPU_6502::SAX() {
-	write(addressAbsolute, A & X);
+	writeTo(addressAbsolute, A & X);
 
 	return 0;
 }
 
 // Decrement Memory and Accumulator
 uint8_t CPU_6502::DCP() {
-	result = lowByte(read(addressAbsolute) - 1);
+	result = lowByte(readFrom(addressAbsolute) - 1);
 
-	write(addressAbsolute, result);
+	writeTo(addressAbsolute, result);
 
 	result = (uint16_t)A - (uint16_t)result;
 
@@ -719,15 +719,15 @@ uint8_t CPU_6502::DCP() {
 
 // Increment Memory and Subtract Memory from Accumulator
 uint8_t CPU_6502::ISB() {
-	result = lowByte(read(addressAbsolute) + 1);
+	result = lowByte(readFrom(addressAbsolute) + 1);
 
-	write(addressAbsolute, result);
+	writeTo(addressAbsolute, result);
 
-	result = (uint16_t)A + ((uint16_t)read(addressAbsolute) ^ 0x00FF) + (uint16_t)PS.CF;
+	result = (uint16_t)A + ((uint16_t)readFrom(addressAbsolute) ^ 0x00FF) + (uint16_t)PS.CF;
 
 	PS.CF = (result > 0xFF);
 	checkZF(lowByte(result));
-	PS.OF = !(0 == ((result ^ (uint16_t)A) & (result ^ ((uint16_t)read(addressAbsolute) ^ 0x00FF)) & 0x0080));
+	PS.OF = !(0 == ((result ^ (uint16_t)A) & (result ^ ((uint16_t)readFrom(addressAbsolute) ^ 0x00FF)) & 0x0080));
 	checkNF(lowByte(result));
 
 	A = lowByte(result);
@@ -742,7 +742,7 @@ uint8_t CPU_6502::SLO() {
 	result = (uint16_t)fetchedData << 1;
 	A |= lowByte(result);
 
-	write(addressAbsolute, lowByte(result));
+	writeTo(addressAbsolute, lowByte(result));
 
 	PS.CF = (result > 0xFF);
 	checkZF(A);
@@ -758,7 +758,7 @@ uint8_t CPU_6502::RLA() {
 	result = ((uint16_t)fetchedData << 1) + (uint16_t)PS.CF;
 	A &= lowByte(result);
 
-	write(addressAbsolute, lowByte(result));
+	writeTo(addressAbsolute, lowByte(result));
 
 	PS.CF = (result > 0xFF);
 	checkZF(A);
@@ -774,7 +774,7 @@ uint8_t CPU_6502::SRE() {
 	result = fetchedData >> 1;
 	A ^= result;
 
-	write(addressAbsolute, result);
+	writeTo(addressAbsolute, result);
 
 	PS.CF = (fetchedData & 0x01);
 	checkZF(A);
@@ -788,7 +788,7 @@ uint8_t CPU_6502::RRA() {
 	fetchData();
 
 	addressRelative = (fetchedData >> 1) ^ (PS.CF << 7);
-	write(addressAbsolute, addressRelative);
+	writeTo(addressAbsolute, addressRelative);
 
 	PS.CF = (fetchedData & 1);
 

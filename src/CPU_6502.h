@@ -13,8 +13,8 @@
 #define nmiVectorHigh	0xFFFB
 #define nmiVectorLow	0xFFFA
 
-#define pull() (read(stackBase + ++SP))
-#define push(value) (write(stackBase + SP--, value))
+#define pull() (readFrom(stackBase + ++SP))
+#define push(value) (writeTo(stackBase + SP--, value))
 
 #define lowByte(value) (uint8_t)(value & 0x00FF)
 #define highByte(value) (uint8_t)((value >> 8) & 0x00FF)
@@ -24,7 +24,7 @@
 #define checkCF(value) (PS.CF = ((value & 0x100) >> 8))
 
 
-class CPU_6502 : public INesCpu, public IBusMaster<uint16_t, uint8_t> {
+class CPU_6502 final : public INesCpu, public IBusMaster<uint16_t, uint8_t> {
 private:
 	//			+--------------------+
 	//			|   CPU Registers	 |
@@ -88,11 +88,11 @@ private:
 	//			+--------------------+
 	//			|  Bus Functionality |
 	//			+--------------------+
-	inline uint8_t read(uint16_t address) override {
+	inline uint8_t readFrom(uint16_t address) override {
 		return m_bus->read(address);
 	}
 
-	inline void write(uint16_t address, uint8_t data) override {
+	inline void writeTo(uint16_t address, uint8_t data) override {
 		m_bus->write(address, data);
 	}
 

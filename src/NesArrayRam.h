@@ -3,7 +3,7 @@
 #include "IRam.h"
 #include "Bus.h"
 
-class NesArrayRam : public IRam<uint16_t, uint8_t> {
+class NesArrayRam final : public IRam<uint16_t, uint8_t> {
 private:
 	uint8_t* m_data;
 	uint16_t m_size;

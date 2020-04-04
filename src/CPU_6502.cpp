@@ -40,7 +40,7 @@ bool CPU_6502::isIMM() {
 
 uint8_t CPU_6502::fetchData() {
 	if (!isIMP())
-		fetchedData = read(addressAbsolute);
+		fetchedData = readFrom(addressAbsolute);
 
 	return fetchedData;
 }
@@ -52,8 +52,8 @@ void CPU_6502::reset() {
 	// Get address for start of execution
 	// and set the Program Counter to it
 	addressAbsolute = 0xFFFC;
-	uint16_t lo = read(addressAbsolute);
-	uint16_t hi = read(addressAbsolute + 1);
+	uint16_t lo = readFrom(addressAbsolute);
+	uint16_t hi = readFrom(addressAbsolute + 1);
 	PC = (hi << 8) | lo;
 
 	// Reset registers to known state
@@ -80,9 +80,9 @@ void CPU_6502::irq() {
 		PS.ID = 1;
 		push(PS.data);
 
-		// Read new program counter location from fixed address
-		uint16_t lo = read(irqVectorLow);
-		uint16_t hi = read(irqVectorHigh);
+		// readFrom new program counter location from fixed address
+		uint16_t lo = readFrom(irqVectorLow);
+		uint16_t hi = readFrom(irqVectorHigh);
 		PC = (hi << 8) | lo;
 
 		// IRQ taks 7 cycles
@@ -99,8 +99,8 @@ void CPU_6502::nmi() {
 	PS.ID = 1;
 	push(PS.data);
 
-	uint16_t lo = read(nmiVectorLow);
-	uint16_t hi = read(nmiVectorHigh);
+	uint16_t lo = readFrom(nmiVectorLow);
+	uint16_t hi = readFrom(nmiVectorHigh);
 	PC = (hi << 8) | lo;
 
 	// NMI taks 8 cycles
@@ -110,7 +110,7 @@ void CPU_6502::nmi() {
 // Runs every clock cycle
 void CPU_6502::tick() {
 	if (cycles == 0) {
-		opcode = read(PC++);
+		opcode = readFrom(PC++);
 		
 		PS.XX = 1;
 
@@ -179,14 +179,14 @@ std::map<uint16_t, std::string> CPU_6502::disassemble(uint16_t nStart, uint16_t 
 		return s;
 	};
 
-	// Starting at the specified address we read an instruction
+	// Starting at the specified address we readFrom an instruction
 	// byte, which in turn yields information from the lookup table
-	// as to how many additional bytes we need to read and what the
-	// addressing mode is. I need this info to assemble human readable
+	// as to how many additional bytes we need to readFrom and what the
+	// addressing mode is. I need this info to assemble human readFromable
 	// syntax, which is different depending upon the addressing mode
 
 	// As the instruction is decoded, a std::string is assembled
-	// with the readable output
+	// with the readFromable output
 	while (addr <= (uint32_t)nStop)
 	{
 		line_addr = addr;
@@ -194,8 +194,8 @@ std::map<uint16_t, std::string> CPU_6502::disassemble(uint16_t nStart, uint16_t 
 		// Prefix line with instruction address
 		std::string sInst = "$" + hex(addr, 4) + ": ";
 
-		// Read instruction, and get its readable name
-		uint8_t opcode = read(addr); addr++;
+		// readFrom instruction, and get its readFromable name
+		uint8_t opcode = readFrom(addr); addr++;
 		sInst += lookup[opcode].name + " ";
 
 		// Get oprands from desired locations, and form the
@@ -209,66 +209,66 @@ std::map<uint16_t, std::string> CPU_6502::disassemble(uint16_t nStart, uint16_t 
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::IMM)
 		{
-			value = read(addr); addr++;
+			value = readFrom(addr); addr++;
 			sInst += "#$" + hex(value, 2) + " {IMM}";
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::ZP0)
 		{
-			lo = read(addr); addr++;
+			lo = readFrom(addr); addr++;
 			hi = 0x00;
 			sInst += "$" + hex(lo, 2) + " {ZP0}";
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::ZPX)
 		{
-			lo = read(addr); addr++;
+			lo = readFrom(addr); addr++;
 			hi = 0x00;
 			sInst += "$" + hex(lo, 2) + ", X {ZPX}";
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::ZPY)
 		{
-			lo = read(addr); addr++;
+			lo = readFrom(addr); addr++;
 			hi = 0x00;
 			sInst += "$" + hex(lo, 2) + ", Y {ZPY}";
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::IZX)
 		{
-			lo = read(addr); addr++;
+			lo = readFrom(addr); addr++;
 			hi = 0x00;
 			sInst += "($" + hex(lo, 2) + ", X) {IZX}";
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::IZY)
 		{
-			lo = read(addr); addr++;
+			lo = readFrom(addr); addr++;
 			hi = 0x00;
 			sInst += "($" + hex(lo, 2) + "), Y {IZY}";
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::ABS)
 		{
-			lo = read(addr); addr++;
-			hi = read(addr); addr++;
+			lo = readFrom(addr); addr++;
+			hi = readFrom(addr); addr++;
 			sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + " {ABS}";
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::ABX)
 		{
-			lo = read(addr); addr++;
-			hi = read(addr); addr++;
+			lo = readFrom(addr); addr++;
+			hi = readFrom(addr); addr++;
 			sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + ", X {ABX}";
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::ABY)
 		{
-			lo = read(addr); addr++;
-			hi = read(addr); addr++;
+			lo = readFrom(addr); addr++;
+			hi = readFrom(addr); addr++;
 			sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + ", Y {ABY}";
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::IND)
 		{
-			lo = read(addr); addr++;
-			hi = read(addr); addr++;
+			lo = readFrom(addr); addr++;
+			hi = readFrom(addr); addr++;
 			sInst += "($" + hex((uint16_t)(hi << 8) | lo, 4) + ") {IND}";
 		}
 		else if (lookup[opcode].addressMode == &CPU_6502::REL)
 		{
-			value = read(addr); addr++;
+			value = readFrom(addr); addr++;
 			sInst += "$" + hex(value, 2) + " [$" + hex(addr + value, 4) + "] {REL}";
 		}
 
