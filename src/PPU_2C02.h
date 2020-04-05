@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include "INesPpu.h"
 
 
@@ -14,7 +16,7 @@ private:
 	}
 
 public:
-	void connectBus(Bus<uint16_t, uint8_t>* bus) override;
+	void connectBus(IBus<uint16_t, uint8_t>* bus) override;
 
 	uint16_t size() override;
 	uint8_t read(uint16_t address) override;

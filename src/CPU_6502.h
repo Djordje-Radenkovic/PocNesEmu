@@ -1,7 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <fstream>
+
+#include "fmt/format.h"
 
 #include "INesCpu.h"
 #include "IBusMaster.h"
@@ -24,7 +27,7 @@
 #define checkCF(value) (PS.CF = ((value & 0x100) >> 8))
 
 
-class CPU_6502 final : public INesCpu, public IBusMaster<uint16_t, uint8_t> {
+class CPU_6502 final : public INesCpu {
 private:
 	//			+--------------------+
 	//			|   CPU Registers	 |
@@ -129,7 +132,7 @@ public:
 
 	~CPU_6502();
 
-	void connectBus(Bus<uint16_t, uint8_t>* bus) override;
+	void connectBus(IBus<uint16_t, uint8_t>* bus) override;
 	bool isFinished() override;
 	inline size_t getCyclesPassed() override { return totalCyclesPassed; }
 

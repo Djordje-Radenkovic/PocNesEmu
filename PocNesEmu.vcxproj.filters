@@ -31,9 +31,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NesCore.h" />
-    <ClInclude Include="src\Bus.h">
-      <Filter>Bus</Filter>
-    </ClInclude>
     <ClInclude Include="src\IBusMaster.h">
       <Filter>Bus</Filter>
     </ClInclude>
@@ -76,6 +73,15 @@
     <ClInclude Include="src\INesPpu.h">
       <Filter>PPU</Filter>
     </ClInclude>
+    <ClInclude Include="src\IBus.h">
+      <Filter>Bus</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NesMultiMapBus.h">
+      <Filter>Bus</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NesVectorBus.h">
+      <Filter>Bus</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
@@ -103,6 +109,12 @@
     <ClCompile Include="src\NesCore.cpp" />
     <ClCompile Include="src\PPU_2C02.cpp">
       <Filter>PPU</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NesMultiMapBus.cpp">
+      <Filter>Bus</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NesVectorBus.cpp">
+      <Filter>Bus</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,11 +1,14 @@
 #include <fstream>
 
+#include "fmt/printf.h"
+
 #include "NesCore.h"
+#include "Config.h"
 
 
 
 NesCore::NesCore(INesCpu* cpu, INesPpu* ppu, IRam<uint16_t, uint8_t>* ram,
-	Bus<uint16_t, uint8_t>* cpuBus, Bus<uint16_t, uint8_t>* ppuBus) :
+	IBus<uint16_t, uint8_t>* cpuBus, IBus<uint16_t, uint8_t>* ppuBus) :
 	m_cpu(cpu), m_ppu(ppu), m_ram(ram), m_cpuBus(cpuBus), m_ppuBus(ppuBus)
 {
 	// Connect CPU to its bus
@@ -40,8 +43,8 @@ NesCore::NesCore(INesCpu* cpu, INesPpu* ppu, IRam<uint16_t, uint8_t>* ram,
 NesCore::~NesCore() {
 	m_cpu->~INesCpu();
 	m_ram->~IRam();
-	m_cpuBus->~Bus();
-	m_ppuBus->~Bus();
+	m_cpuBus->~IBus();
+	m_ppuBus->~IBus();
 	m_patternTable->~IRam();
 	m_nameTable->~IRam();
 	m_palletteRam->~IRam();
@@ -49,7 +52,7 @@ NesCore::~NesCore() {
 
 
 // Maybe move this into Bus.h?
-void NesCore::dump_memory(Bus<uint16_t, uint8_t>* bus, size_t startAddress = 0, size_t endAddress = 0xFFFF) {
+void NesCore::dump_memory(IBus<uint16_t, uint8_t>* bus, size_t startAddress = 0, size_t endAddress = 0xFFFF) {
 	std::ofstream memDumpFile(MEM_DUMP_FILE_PATH, std::ofstream::out);
 	if (!memDumpFile.is_open()) {
 		fmt::print("Failed to open memdump.log file!\n");
@@ -145,5 +148,12 @@ void NesCore::nesTest() {
 	// Memory dump
 	fmt::print("\n");
 	dump_memory(m_cpuBus);
-	dump_memory(m_ppuBus);
+	// dump_memory(m_ppuBus);
+
+	//for (int i = 0; i <= 0xFFFF; i++) {
+	//	if (!m_cpuBus->write(i, i & 0x00FF))
+	//		fmt::print("Failed to write\n");
+	//}
+
+	//dump_memory(m_cpuBus);
 }

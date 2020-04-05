@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IRam.h"
-#include "Bus.h"
+
 
 class NesArrayRam final : public IRam<uint16_t, uint8_t> {
 private:

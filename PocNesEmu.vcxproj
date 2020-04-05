@@ -19,11 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Bus.h" />
+    <ClInclude Include="src\NesMultiMapBus.h" />
     <ClInclude Include="src\CPU_2A03.h" />
     <ClInclude Include="src\CPU_6502.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\filesystem.h" />
+    <ClInclude Include="src\IBus.h" />
     <ClInclude Include="src\IBusMaster.h" />
     <ClInclude Include="src\IBusSlave.h" />
     <ClInclude Include="src\INesCartridge.h" />
@@ -34,6 +35,7 @@
     <ClInclude Include="src\NesApu.h" />
     <ClInclude Include="src\NesArrayRam.h" />
     <ClInclude Include="src\NesCore.h" />
+    <ClInclude Include="src\NesVectorBus.h" />
     <ClInclude Include="src\PPU_2C02.h" />
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +48,8 @@
     <ClCompile Include="src\filesystem.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\NesCore.cpp" />
+    <ClCompile Include="src\NesMultiMapBus.cpp" />
+    <ClCompile Include="src\NesVectorBus.cpp" />
     <ClCompile Include="src\PPU_2C02.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

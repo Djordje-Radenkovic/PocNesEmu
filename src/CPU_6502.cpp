@@ -26,7 +26,7 @@ struct CPU_6502::CpuInstruction
 	uint8_t cycles = 0;
 };
 
-void CPU_6502::connectBus(Bus<uint16_t, uint8_t>* bus) {
+void CPU_6502::connectBus(IBus<uint16_t, uint8_t>* bus) {
 	m_bus = bus;
 }
 

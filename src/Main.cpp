@@ -4,6 +4,8 @@
 #include "CPU_6502.h"
 #include "PPU_2C02.h"
 #include "NesArrayRam.h"
+#include "NesMultiMapBus.h"
+#include "NesVectorBus.h"
 
 
 int main(int argc, char** argv) {
@@ -15,8 +17,8 @@ int main(int argc, char** argv) {
 	INesCpu* cpu = new CPU_6502(DEBUG_FILE_PATH);
 	INesPpu* ppu = new PPU_2C02();
 	IRam<uint16_t, uint8_t>* mainMemory = new NesArrayRam(0x0800);
-	auto* cpuBus = new Bus<uint16_t, uint8_t>();
-	auto* ppuBus = new Bus<uint16_t, uint8_t>();
+	IBus<uint16_t, uint8_t>* cpuBus = new NesMultiMapBus;
+	IBus<uint16_t, uint8_t>* ppuBus = new NesMultiMapBus;
 
 	// Create the system instance
 	NesCore nes(cpu, ppu, mainMemory, cpuBus, ppuBus);

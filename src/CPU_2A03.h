@@ -4,6 +4,6 @@
 
 // Placeholder, don't plan on implementing it yet
 
-class CPU_2A03 : public INesCpu{
+class CPU_2A03 : public INesCpu {
 
 };
