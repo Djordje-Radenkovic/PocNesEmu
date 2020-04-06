@@ -7,9 +7,9 @@ void NesVectorBus::addSlave(
 	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
 	uint16_t startAddress, uint16_t endAddress) {
 
-	// Check for valid address
+	// TODO: Check for valid address
 
-	// Check for overlap
+	// TODO: Check for overlap
 
 	slave->setAddressRange(startAddress, endAddress);
 	m_slaves.push_back(slave);
@@ -19,9 +19,9 @@ void NesVectorBus::addSlave(
 	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
 	uint16_t startAddress) {
 
-	// Check for valid address
+	// TODO: Check for valid address
 
-	// Check for overlap
+	// TODO: Check for overlap
 
 	slave->setAddressRange(startAddress);
 	m_slaves.push_back(slave);

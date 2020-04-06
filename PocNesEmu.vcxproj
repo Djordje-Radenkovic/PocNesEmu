@@ -26,15 +26,14 @@
     <ClInclude Include="src\IBus.h" />
     <ClInclude Include="src\IBusMaster.h" />
     <ClInclude Include="src\IBusSlave.h" />
-    <ClInclude Include="src\INesCartridge.h" />
+    <ClInclude Include="src\NesCartridge.h" />
     <ClInclude Include="src\INesCpu.h" />
     <ClInclude Include="src\INesPpu.h" />
-    <ClInclude Include="src\INesRom.h" />
     <ClInclude Include="src\IRam.h" />
     <ClInclude Include="src\NesApu.h" />
     <ClInclude Include="src\NesArrayRam.h" />
     <ClInclude Include="src\NesCore.h" />
-    <ClInclude Include="src\NesVectorBus.h" />
+    <ClInclude Include="src\NesRom.h" />
     <ClInclude Include="src\PPU_2C02.h" />
   </ItemGroup>
   <ItemGroup>
@@ -43,12 +42,11 @@
     <ClCompile Include="src\CPU_6502.cpp" />
     <ClCompile Include="src\CPU_6502_AddressingModes.cpp" />
     <ClCompile Include="src\CPU_6502_Instructions.cpp" />
-    <ClCompile Include="src\CPU_6502_LookupVector.cpp" />
     <ClCompile Include="src\filesystem.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\NesCartridge.cpp" />
     <ClCompile Include="src\NesCore.cpp" />
     <ClCompile Include="src\NesMultiMapBus.cpp" />
-    <ClCompile Include="src\NesVectorBus.cpp" />
     <ClCompile Include="src\PPU_2C02.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

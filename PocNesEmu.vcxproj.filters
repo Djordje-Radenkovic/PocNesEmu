@@ -43,12 +43,6 @@
     <ClInclude Include="src\CPU_6502.h">
       <Filter>CPU</Filter>
     </ClInclude>
-    <ClInclude Include="src\INesRom.h">
-      <Filter>ROM</Filter>
-    </ClInclude>
-    <ClInclude Include="src\INesCartridge.h">
-      <Filter>ROM</Filter>
-    </ClInclude>
     <ClInclude Include="src\IRam.h">
       <Filter>RAM</Filter>
     </ClInclude>
@@ -76,15 +70,15 @@
     <ClInclude Include="src\NesMultiMapBus.h">
       <Filter>Bus</Filter>
     </ClInclude>
-    <ClInclude Include="src\NesVectorBus.h">
-      <Filter>Bus</Filter>
+    <ClInclude Include="src\NesCartridge.h">
+      <Filter>ROM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NesRom.h">
+      <Filter>ROM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\CPU_6502_LookupVector.cpp">
-      <Filter>CPU</Filter>
-    </ClCompile>
     <ClCompile Include="src\CPU_6502_Instructions.cpp">
       <Filter>CPU</Filter>
     </ClCompile>
@@ -110,8 +104,8 @@
     <ClCompile Include="src\NesMultiMapBus.cpp">
       <Filter>Bus</Filter>
     </ClCompile>
-    <ClCompile Include="src\NesVectorBus.cpp">
-      <Filter>Bus</Filter>
+    <ClCompile Include="src\NesCartridge.cpp">
+      <Filter>ROM</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -4,11 +4,28 @@
 
 
 void NesMultiMapBus::addSlave(
+	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
+	uint16_t startAddress, uint16_t endAddress) {
+
+	m_addSlave(slave, startAddress, endAddress);
+}
+
+
+void NesMultiMapBus::addSlave(
+	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
+	uint16_t startAddress) {
+	
+	uint16_t endAddress = startAddress + slave->size() - 1;
+	m_addSlave(slave, startAddress, endAddress);
+}
+
+
+void NesMultiMapBus::m_addSlave(
 	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slaveToAdd,
-	uint16_t startAddressToAdd, uint16_t endAddressToAdd) {
+	uint16_t startAddress, uint16_t endAddress) {
 
 	// Check if the end address goes above the address space
-	if (((size_t)startAddressToAdd + slaveToAdd->size() - 1) > maxAddress) {
+	if (endAddress > maxAddress) {
 		throw std::overflow_error("Slave's end address overflows possible address space");
 		return;
 	}
@@ -16,29 +33,21 @@ void NesMultiMapBus::addSlave(
 	// Check every existing slave for overlap with new slave
 	for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it) {
 		// Existing slave's addresses
-		std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave = it->first;
-		uint16_t startAddress = it->second;
-		uint16_t size = slave->size();
-		uint16_t endAddress = startAddress + size - 1;
-
-		// New slave's end address
-		uint16_t endAddressToAdd = startAddressToAdd + slaveToAdd->size() - 1;
+		m_tempSlave = it->first;
+		std::array<uint16_t, 2>& edges = it->second;
 
 		// Check for overlap
-		if (endAddressToAdd >= startAddress 
-			&& endAddressToAdd < endAddress) {
+		if (endAddress >= edges[0] && endAddress < edges[1]) {
 
 			throw std::range_error("Slave addresses overlaping");
 			return;
 		}
-		else if (startAddressToAdd >= startAddress 
-				&& startAddressToAdd < endAddress) {
+		else if (startAddress >= edges[0] && startAddress < edges[1]) {
 
 			throw std::range_error("Slave addresses overlaping");
 			return;
 		}
-		else if (startAddress >= startAddressToAdd 
-			&& endAddress < endAddressToAdd) {
+		else if (edges[0] >= startAddress && edges[1] < endAddress) {
 
 			throw std::range_error("Slave addresses overlaping");
 			return;
@@ -47,64 +56,56 @@ void NesMultiMapBus::addSlave(
 
 	// Add new slave
 	fmt::printf("Added slave: $%04X-$%04X\n", 
-		(int)startAddressToAdd, startAddressToAdd + slaveToAdd->size() - 1);
+		(int)startAddress, endAddress);
 
-	m_slaves.insert(std::make_pair(slaveToAdd, startAddressToAdd));
+	m_slaves.insert(std::make_pair(
+		slaveToAdd, std::array<uint16_t, 2> {startAddress, endAddress}
+	));
 }
 
 
-std::shared_ptr<IBusSlave<uint16_t, uint8_t>>
-NesMultiMapBus::getSlaveWithAddress(uint16_t address) {
+void NesMultiMapBus::getSlaveWithAddress(uint16_t address) {
 	// Check if address is in address space
-	if (address < 0 || address > maxAddress) return nullptr;
+	if (address < 0 || address > maxAddress) return;
 
 	// Find slave that occupies the address and return it
 	for (auto it = m_slaves.begin(); it != m_slaves.end(); ++it) {
-		std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave = it->first;
-		uint16_t startAddress = it->second;
+		m_tempSlave = it->first;
+		std::array<uint16_t, 2>& edges = it->second;
 
-		if ((address >= startAddress) && 
-			(address <= (startAddress + slave->size() - 1))) {
-			lastRetrievedStartAddress = startAddress;
-			return slave;
+		if (address >= edges[0] && address <= edges[1]) {
+			lastRetrievedStartAddress = edges[0];
+			return;
 		}
 	}
 
 	// If no slave has the address return nullptr
-	return nullptr;
+	m_tempSlave = nullptr;
+	return;
 }
 
 
-bool NesMultiMapBus::write(uint16_t address, uint8_t data, bool log) {
+bool NesMultiMapBus::write(uint16_t address, uint8_t data) {
 	// Write to appropriate slave
-	m_tempSlave = getSlaveWithAddress(address);
-	if (m_tempSlave == nullptr) {
-		if (log)
-			fmt::printf("No slaves match the address %04X. No write will happen.",
-				(int)address);
-
+	getSlaveWithAddress(address);
+	if (m_tempSlave == nullptr)
 		return false;
-	}
 
-	m_tempSlave->write(address - lastRetrievedStartAddress, data);
+	m_tempSlave->write(address % m_tempSlave->size(), data);
 
 	return true;
 }
 
 
-uint8_t NesMultiMapBus::read(uint16_t address, bool log, bool readOnly) {
+uint8_t NesMultiMapBus::read(uint16_t address) {
 	// Read from appropriate slave
-	m_tempSlave = getSlaveWithAddress(address);
-	if (m_tempSlave == nullptr) {
-		if (log)
-			fmt::printf("No slaves match the address %04X. Read will return -1 (0xFF).",
-				(int)address);
-
+	getSlaveWithAddress(address);
+	if (m_tempSlave == nullptr)
 		return -1;
-	}
 
-	return m_tempSlave->read(address - lastRetrievedStartAddress);
+	return m_tempSlave->read(address % m_tempSlave->size());
 }
+
 
 void NesMultiMapBus::dump_memory(const char* filePath,
 	uint16_t startAddress, uint16_t endAddress) {

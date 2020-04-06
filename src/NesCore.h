@@ -1,6 +1,6 @@
 #pragma once
 
-#include "INesCartridge.h"
+#include "NesCartridge.h"
 #include "INesCpu.h"
 #include "INesPpu.h"
 #include "IBus.h"
@@ -21,13 +21,9 @@ public:
 
 	void nesTest();
 
-	void powerOn();
-	void powerOff();
-	void pause();
-	void resume();
-	void saveState();
-	void loadState();
 	bool loadCartridge(const char* filePath);
+	void reset();
+	void tick();
 
 private:
 	std::shared_ptr<INesCpu> m_cpu;
@@ -38,8 +34,7 @@ private:
 
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_ram;
 
-	std::shared_ptr<IRam<uint16_t, uint8_t>> m_mainRom;
-	std::shared_ptr<IRam<uint16_t, uint8_t>> m_otherRom;
+	std::shared_ptr<IRam<uint16_t, uint8_t>> m_cartridge;
 
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_patternTable;
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_nameTable;
@@ -48,6 +43,8 @@ private:
 private:
 	void runCPU_nCycles(size_t nCycles);
 	void runCPU_nInstructions(size_t nInstructions);
-	static void dump_memory(std::shared_ptr<IBus<uint16_t, uint8_t>> bus,
-		size_t startAddress = 0, size_t endAddress = 0xFFFF);
+
+private:
+	size_t totalCyclesPassed = 0;
+
 };

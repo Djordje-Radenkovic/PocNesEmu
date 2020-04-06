@@ -1,21 +1,26 @@
 #pragma once
 
 #include <map>
+#include <array>
 
 #include "IBus.h"
 
 
 class NesMultiMapBus : public IBus<uint16_t, uint8_t> {
 public:
-	void addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slaveToAdd,
-		uint16_t startAddressToAdd, uint16_t endAddressToAdd = 0) override;
+	void addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
+		uint16_t startAddress, uint16_t endAddress) override;
 
-	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> 
-		getSlaveWithAddress(uint16_t address) override;
+	void addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
+		uint16_t startAddress) override;
 
-	bool write(uint16_t address, uint8_t data, bool log = false) override;
-	uint8_t read(uint16_t address,
-		bool log = false, bool readOnly = false) override;
+	void m_addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
+		uint16_t startAddress, uint16_t endAddress);
+
+	void getSlaveWithAddress(uint16_t address) override;
+
+	bool write(uint16_t address, uint8_t data) override;
+	uint8_t read(uint16_t address) override;
 
 	void dump_memory(const char* filePath,
 		uint16_t startAddress = 0, uint16_t endAddress = maxAddress) override;
@@ -25,7 +30,7 @@ private:
 	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> m_tempSlave = nullptr;
 
 	std::multimap<std::shared_ptr<IBusSlave<uint16_t, uint8_t>>,
-				  uint16_t> m_slaves;
+				  std::array<uint16_t, 2>> m_slaves;
 
 	std::ofstream m_memDumpFile;
 };
