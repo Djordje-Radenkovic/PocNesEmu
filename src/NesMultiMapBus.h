@@ -19,12 +19,15 @@ public:
 	uint8_t read(uint16_t address,
 		bool log = false, bool readOnly = false) override;
 
+	void dump_memory(const char* filePath,
+		size_t startAddress = 0, size_t endAddress = maxAddress) override;
+
 private:
 	uint16_t lastRetrievedStartAddress = 0;
 	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> m_tempSlave = nullptr;
 
-	std::multimap<
-		std::shared_ptr<IBusSlave<uint16_t, uint8_t>>, uint16_t
-	> m_slaves;
+	std::multimap<std::shared_ptr<IBusSlave<uint16_t, uint8_t>>,
+				  uint16_t> m_slaves;
 
+	std::ofstream m_memDumpFile;
 };

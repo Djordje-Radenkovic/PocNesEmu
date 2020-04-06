@@ -1,6 +1,7 @@
 #pragma once
 
 #include <limits>
+#include <fstream>
 
 #include "IBusSlave.h"
 
@@ -17,6 +18,9 @@ public:
 	virtual bool write(addressWidth address, dataWidth data, bool log = false) = 0;
 	virtual dataWidth read(addressWidth address,
 		bool log = false, bool readOnly = false) = 0;
+
+	virtual void dump_memory(const char* filePath,
+		size_t startAddress = 0, size_t endAddresss = maxAddress) = 0;
 
 protected:
 	static const size_t maxAddress = std::numeric_limits<addressWidth>::max();

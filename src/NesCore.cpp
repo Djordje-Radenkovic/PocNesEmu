@@ -43,28 +43,6 @@ NesCore::NesCore(
 }
 
 
-// Maybe move this into Bus.h?
-void NesCore::dump_memory(std::shared_ptr<IBus<uint16_t, uint8_t>> bus,
-	size_t startAddress, size_t endAddress) {
-
-	std::ofstream memDumpFile(MEM_DUMP_FILE_PATH, std::ofstream::out);
-	if (!memDumpFile.is_open()) {
-		fmt::print("Failed to open memdump.log file!\n");
-		return;
-	}
-
-	for (int i = 0; i <= 0xFFFF; i++) {
-		if (i % 0x10 == 0) {
-			fmt::fprintf(memDumpFile, "\n0x%04X: ", i);
-		}
-		fmt::fprintf(memDumpFile, "%02X ", bus->read(i, false, false));
-	}
-	memDumpFile.flush();
-	memDumpFile.close();
-	fmt::printf("Dumped memory to disk ($%04X-$%04X).\n", startAddress, endAddress);
-}
-
-
 void NesCore::runCPU_nCycles(size_t nCycles) {
 	m_cpu->reset();
 	do {
@@ -138,13 +116,5 @@ void NesCore::nesTest() {
 
 	// Memory dump
 	fmt::print("\n");
-	dump_memory(m_cpuBus);
-	// dump_memory(m_ppuBus);
-
-	//for (int i = 0; i <= 0xFFFF; i++) {
-	//	if (!m_cpuBus->write(i, i & 0x00FF))
-	//		fmt::print("Failed to write\n");
-	//}
-
-	//dump_memory(m_cpuBus);
+	m_cpuBus->dump_memory(MEM_DUMP_FILE_PATH);
 }

@@ -1,3 +1,5 @@
+#include "fmt/core.h"
+
 #include "NesMultiMapBus.h"
 
 
@@ -102,4 +104,24 @@ uint8_t NesMultiMapBus::read(uint16_t address, bool log, bool readOnly) {
 	}
 
 	return m_tempSlave->read(address - lastRetrievedStartAddress);
+}
+
+void NesMultiMapBus::dump_memory(const char* filePath,
+	size_t startAddress, size_t endAddress) {
+
+	m_memDumpFile.open(filePath, std::ofstream::out);
+
+	if (!m_memDumpFile.is_open()) {
+		fmt::print("Failed to open memdump.log file!\n");
+		return;
+	}
+
+	for (int i = 0; i <= 0xFFFF; i++) {
+		if (i % 0x10 == 0) {
+			fmt::fprintf(m_memDumpFile, "\n0x%04X: ", i);
+		}
+		fmt::fprintf(m_memDumpFile, "%02X ", read(i));
+	}
+	m_memDumpFile.close();
+	fmt::printf("Dumped memory to disk ($%04X-$%04X).\n", startAddress, endAddress);
 }
