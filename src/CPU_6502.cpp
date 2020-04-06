@@ -1,10 +1,6 @@
 #include "CPU_6502.h"
 
 
-CPU_6502::CPU_6502() {
-
-}
-
 CPU_6502::CPU_6502(const char* debugFilePath) {
 	m_debugFile.open(debugFilePath, std::ofstream::out);
 	
@@ -14,7 +10,6 @@ CPU_6502::CPU_6502(const char* debugFilePath) {
 }
 
 CPU_6502::~CPU_6502() {
-	m_debugFile.flush();
 	m_debugFile.close();
 }
 
@@ -26,7 +21,7 @@ struct CPU_6502::CpuInstruction
 	uint8_t cycles = 0;
 };
 
-void CPU_6502::connectBus(IBus<uint16_t, uint8_t>* bus) {
+void CPU_6502::connectBus(std::shared_ptr<IBus<uint16_t, uint8_t>> bus) {
 	m_bus = bus;
 }
 
@@ -114,7 +109,7 @@ void CPU_6502::tick() {
 		
 		PS.XX = 1;
 
-		(this->lookup[opcode].name).copy(currentInstructionName, sizeof currentInstructionName);
+		currentInstructionName = (this->lookup[opcode].name);
 
 		cycles = lookup[opcode].cycles;
 
@@ -160,124 +155,3 @@ std::vector<CPU_6502::CpuInstruction> CPU_6502::lookup =
 /*  Ex  */	{ "CPX", &c::CPX, &c::IMM, 2 },{ "SBC", &c::SBC, &c::IZX, 6 },{ "???", &c::NOP, &c::IMP, 2 },{ "ISB", &c::ISB, &c::IZX, 8 },{ "CPX", &c::CPX, &c::ZP0, 3 },{ "SBC", &c::SBC, &c::ZP0, 3 },{ "INC", &c::INC, &c::ZP0, 5 },{ "ISB", &c::ISB, &c::ZP0, 5 },{ "INX", &c::INX, &c::IMP, 2 },{ "SBC", &c::SBC, &c::IMM, 2 },{ "NOP", &c::NOP, &c::IMP, 2 },{ "SBC", &c::SBC, &c::IMM, 2 },{ "CPX", &c::CPX, &c::ABS, 4 },{ "SBC", &c::SBC, &c::ABS, 4 },{ "INC", &c::INC, &c::ABS, 6 },{ "ISB", &c::ISB, &c::ABS, 6 },
 /*  Fx  */	{ "BEQ", &c::BEQ, &c::REL, 2 },{ "SBC", &c::SBC, &c::IZY, 5 },{ "???", &c::XXX, &c::IMP, 2 },{ "ISB", &c::ISB, &c::IZY, 8 },{ "NOP", &c::NOP, &c::ZPX, 4 },{ "SBC", &c::SBC, &c::ZPX, 4 },{ "INC", &c::INC, &c::ZPX, 6 },{ "ISB", &c::ISB, &c::ZPX, 6 },{ "SED", &c::SED, &c::IMP, 2 },{ "SBC", &c::SBC, &c::ABY, 4 },{ "NOP", &c::NOP, &c::IMP, 2 },{ "ISB", &c::ISB, &c::ABY, 7 },{ "NOP", &c::NOP, &c::ABX, 4 },{ "SBC", &c::SBC, &c::ABX, 4 },{ "INC", &c::INC, &c::ABX, 7 },{ "ISB", &c::ISB, &c::ABX, 7 },
 };
-
-
-std::map<uint16_t, std::string> CPU_6502::disassemble(uint16_t nStart, uint16_t nStop) {
-	uint32_t addr = nStart;
-	uint8_t value = 0x00, lo = 0x00, hi = 0x00;
-	std::map<uint16_t, std::string> mapLines;
-	uint16_t line_addr = 0;
-
-	// A convenient utility to convert variables into
-	// hex strings because "modern C++"'s method with 
-	// streams is atrocious
-	auto hex = [](uint32_t n, uint8_t d)
-	{
-		std::string s(d, '0');
-		for (int i = d - 1; i >= 0; i--, n >>= 4)
-			s[i] = "0123456789ABCDEF"[n & 0xF];
-		return s;
-	};
-
-	// Starting at the specified address we readFrom an instruction
-	// byte, which in turn yields information from the lookup table
-	// as to how many additional bytes we need to readFrom and what the
-	// addressing mode is. I need this info to assemble human readFromable
-	// syntax, which is different depending upon the addressing mode
-
-	// As the instruction is decoded, a std::string is assembled
-	// with the readFromable output
-	while (addr <= (uint32_t)nStop)
-	{
-		line_addr = addr;
-
-		// Prefix line with instruction address
-		std::string sInst = "$" + hex(addr, 4) + ": ";
-
-		// readFrom instruction, and get its readFromable name
-		uint8_t opcode = readFrom(addr); addr++;
-		sInst += lookup[opcode].name + " ";
-
-		// Get oprands from desired locations, and form the
-		// instruction based upon its addressing mode. These
-		// routines mimmick the actual fetch routine of the
-		// 6502 in order to get accurate data as part of the
-		// instruction
-		if (lookup[opcode].addressMode == &CPU_6502::IMP)
-		{
-			sInst += " {IMP}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::IMM)
-		{
-			value = readFrom(addr); addr++;
-			sInst += "#$" + hex(value, 2) + " {IMM}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::ZP0)
-		{
-			lo = readFrom(addr); addr++;
-			hi = 0x00;
-			sInst += "$" + hex(lo, 2) + " {ZP0}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::ZPX)
-		{
-			lo = readFrom(addr); addr++;
-			hi = 0x00;
-			sInst += "$" + hex(lo, 2) + ", X {ZPX}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::ZPY)
-		{
-			lo = readFrom(addr); addr++;
-			hi = 0x00;
-			sInst += "$" + hex(lo, 2) + ", Y {ZPY}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::IZX)
-		{
-			lo = readFrom(addr); addr++;
-			hi = 0x00;
-			sInst += "($" + hex(lo, 2) + ", X) {IZX}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::IZY)
-		{
-			lo = readFrom(addr); addr++;
-			hi = 0x00;
-			sInst += "($" + hex(lo, 2) + "), Y {IZY}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::ABS)
-		{
-			lo = readFrom(addr); addr++;
-			hi = readFrom(addr); addr++;
-			sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + " {ABS}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::ABX)
-		{
-			lo = readFrom(addr); addr++;
-			hi = readFrom(addr); addr++;
-			sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + ", X {ABX}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::ABY)
-		{
-			lo = readFrom(addr); addr++;
-			hi = readFrom(addr); addr++;
-			sInst += "$" + hex((uint16_t)(hi << 8) | lo, 4) + ", Y {ABY}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::IND)
-		{
-			lo = readFrom(addr); addr++;
-			hi = readFrom(addr); addr++;
-			sInst += "($" + hex((uint16_t)(hi << 8) | lo, 4) + ") {IND}";
-		}
-		else if (lookup[opcode].addressMode == &CPU_6502::REL)
-		{
-			value = readFrom(addr); addr++;
-			sInst += "$" + hex(value, 2) + " [$" + hex(addr + value, 4) + "] {REL}";
-		}
-
-		// Add the formed string to a std::map, using the instruction's
-		// address as the key. This makes it convenient to look for later
-		// as the instructions are variable in length, so a straight up
-		// incremental index is not sufficient.
-		mapLines[line_addr] = sInst;
-	}
-
-	return mapLines;
-}

@@ -1,7 +1,7 @@
 #include "PPU_2C02.h"
 
 
-void PPU_2C02::connectBus(IBus<uint16_t, uint8_t>* bus) {
+void PPU_2C02::connectBus(std::shared_ptr<IBus<uint16_t, uint8_t>> bus) {
 	m_bus = bus;
 }
 

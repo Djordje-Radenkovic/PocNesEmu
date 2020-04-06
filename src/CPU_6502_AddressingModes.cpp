@@ -9,11 +9,11 @@
 #ifdef _DEBUG_LOG
 void CPU_6502::log() {
 	fmt::printf("\n%04X  %s  A:%02X X:%02X Y:%02X P:%02X SP:%02X PPU:%3d,%3d CYC:%d",
-		PC-1, debugBuffer.data(), A, X, Y, PS.data, SP, 0, 0, totalCyclesPassed);
+		PC-1, fmt::to_string(debugBuffer), A, X, Y, PS.data, SP, 0, 0, totalCyclesPassed);
 	
 	if (m_debugFile.is_open()) {
 		fmt::fprintf(m_debugFile, "\n%04X  %s  A:%02X X:%02X Y:%02X P:%02X SP:%02X PPU:%3d,%3d CYC:%d",
-			PC - 1, debugBuffer.data(), A, X, Y, PS.data, SP, 0, 0, totalCyclesPassed);
+			PC - 1, fmt::to_string(debugBuffer), A, X, Y, PS.data, SP, 0, 0, totalCyclesPassed);
 	}
 
 	debugBuffer.clear();
@@ -105,11 +105,11 @@ uint8_t CPU_6502::ZPX() {
 	if (opcode == 0x14 || opcode == 0x34 || opcode == 0x54 || opcode == 0x74 ||
 		opcode == 0xD4 || opcode == 0xF4 || opcode == 0xD7 || opcode == 0xF7 ||
 		opcode == 0x17 || opcode == 0x37 || opcode == 0x57 || opcode == 0x77) {
-		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} ${:02X},X @ {:02X} = {:02X}        ",
+		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} ${:02X},X @ {:02X} = {:02X}           ",
 			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute));
 	}
 	else {
-		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X},X @ {:02X} = {:02X}        ",
+		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X},X @ {:02X} = {:02X}           ",
 			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute));
 	}
 	log();
@@ -129,11 +129,11 @@ uint8_t CPU_6502::ZPY() {
 	result = readFrom(PC);
 
 	if (opcode == 0xB7 || opcode == 0x97) {
-		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} ${:02X},Y @ {:02X} = {:02X}        ",
+		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} ${:02X},Y @ {:02X} = {:02X}           ",
 			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute));
 	}
 	else {
-		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X},Y @ {:02X} = {:02X}        ",
+		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X},Y @ {:02X} = {:02X}           ",
 			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute));
 	}
 	log();

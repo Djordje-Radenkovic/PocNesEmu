@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "Config.h"
 #include "filesystem.h"
 #include "NesCore.h"
@@ -13,15 +15,14 @@ int main(int argc, char** argv) {
 	if (!POCNES::dirExists(LOGS_FOLDER_PATH))
 		POCNES::makedir(LOGS_FOLDER_PATH);
 
-	// Create system components
-	INesCpu* cpu = new CPU_6502(DEBUG_FILE_PATH);
-	INesPpu* ppu = new PPU_2C02();
-	IRam<uint16_t, uint8_t>* mainMemory = new NesArrayRam(0x0800);
-	IBus<uint16_t, uint8_t>* cpuBus = new NesMultiMapBus;
-	IBus<uint16_t, uint8_t>* ppuBus = new NesMultiMapBus;
-
 	// Create the system instance
-	NesCore nes(cpu, ppu, mainMemory, cpuBus, ppuBus);
+	NesCore nes(
+		std::make_shared<CPU_6502>(DEBUG_FILE_PATH),
+		std::make_shared<PPU_2C02>(),
+		std::make_shared<NesArrayRam>(0x0800),
+		std::make_shared<NesMultiMapBus>(),
+		std::make_shared<NesMultiMapBus>()
+	);
 
 	// Run NesTest
 	nes.nesTest();

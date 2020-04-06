@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NesMultiMapBus.h" />
-    <ClInclude Include="src\CPU_2A03.h" />
     <ClInclude Include="src\CPU_6502.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\filesystem.h" />

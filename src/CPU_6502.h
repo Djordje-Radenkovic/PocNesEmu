@@ -28,6 +28,22 @@
 
 
 class CPU_6502 final : public INesCpu {
+public:
+	CPU_6502() {}
+	CPU_6502(const char* debugFilePath);
+
+	~CPU_6502();
+
+	void connectBus(std::shared_ptr<IBus<uint16_t, uint8_t>> bus) override;
+
+	inline const size_t getCyclesPassed() override { return totalCyclesPassed; }
+	bool isFinished() override;
+
+	void reset() override;
+	void irq()	 override;
+	void nmi()	 override;
+	void tick()	 override;
+
 private:
 	//			+--------------------+
 	//			|   CPU Registers	 |
@@ -105,9 +121,7 @@ private:
 
 	struct CpuInstruction;
 
-	char currentInstructionName[4];
-	fmt::memory_buffer debugBuffer;
-	void log();
+
 	bool isIMP();
 	bool isIMM();
 
@@ -124,20 +138,7 @@ private:
 
 	static std::vector<CpuInstruction> lookup;
 
-public:
-	std::map<uint16_t, std::string> disassemble(uint16_t nStart, uint16_t nStop);
-
-	CPU_6502();
-	CPU_6502(const char * debugFilePath);
-
-	~CPU_6502();
-
-	void connectBus(IBus<uint16_t, uint8_t>* bus) override;
-	bool isFinished() override;
-	inline size_t getCyclesPassed() override { return totalCyclesPassed; }
-
-	void reset() override;
-	void irq()	 override;
-	void nmi()	 override;
-	void tick()	 override;
+	std::string currentInstructionName;
+	fmt::memory_buffer debugBuffer;
+	void log();
 };

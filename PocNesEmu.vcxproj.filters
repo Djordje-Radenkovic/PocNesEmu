@@ -43,9 +43,6 @@
     <ClInclude Include="src\CPU_6502.h">
       <Filter>CPU</Filter>
     </ClInclude>
-    <ClInclude Include="src\CPU_2A03.h">
-      <Filter>CPU</Filter>
-    </ClInclude>
     <ClInclude Include="src\INesRom.h">
       <Filter>ROM</Filter>
     </ClInclude>

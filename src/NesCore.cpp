@@ -6,11 +6,14 @@
 #include "Config.h"
 
 
+NesCore::NesCore(
+	std::shared_ptr<INesCpu> cpu,
+	std::shared_ptr<INesPpu> ppu,
+	std::shared_ptr<IRam<uint16_t, uint8_t>> ram,
+	std::shared_ptr<IBus<uint16_t, uint8_t>> cpuBus,
+	std::shared_ptr<IBus<uint16_t, uint8_t>> ppuBus
+) : m_cpu(cpu), m_ppu(ppu), m_ram(ram), m_cpuBus(cpuBus), m_ppuBus(ppuBus) {
 
-NesCore::NesCore(INesCpu* cpu, INesPpu* ppu, IRam<uint16_t, uint8_t>* ram,
-	IBus<uint16_t, uint8_t>* cpuBus, IBus<uint16_t, uint8_t>* ppuBus) :
-	m_cpu(cpu), m_ppu(ppu), m_ram(ram), m_cpuBus(cpuBus), m_ppuBus(ppuBus)
-{
 	// Connect CPU to its bus
 	m_cpu->connectBus(m_cpuBus);
 
@@ -27,9 +30,9 @@ NesCore::NesCore(INesCpu* cpu, INesPpu* ppu, IRam<uint16_t, uint8_t>* ram,
 	m_ppu->connectBus(m_ppuBus);
 
 	// Add PPU's RAMs to its bus
-	m_patternTable = new NesArrayRam(0x2000);
-	m_nameTable = new NesArrayRam(0x1000);
-	m_palletteRam = new NesArrayRam(0x20);
+	m_patternTable = std::make_shared<NesArrayRam>(0x2000);
+	m_nameTable = std::make_shared<NesArrayRam>(0x1000);
+	m_palletteRam = std::make_shared<NesArrayRam>(0x20);
 	m_ppuBus->addSlave(m_patternTable, 0x0000);
 	m_ppuBus->addSlave(m_nameTable, 0x2000);
 
@@ -40,19 +43,10 @@ NesCore::NesCore(INesCpu* cpu, INesPpu* ppu, IRam<uint16_t, uint8_t>* ram,
 }
 
 
-NesCore::~NesCore() {
-	m_cpu->~INesCpu();
-	m_ram->~IRam();
-	m_cpuBus->~IBus();
-	m_ppuBus->~IBus();
-	m_patternTable->~IRam();
-	m_nameTable->~IRam();
-	m_palletteRam->~IRam();
-}
-
-
 // Maybe move this into Bus.h?
-void NesCore::dump_memory(IBus<uint16_t, uint8_t>* bus, size_t startAddress = 0, size_t endAddress = 0xFFFF) {
+void NesCore::dump_memory(std::shared_ptr<IBus<uint16_t, uint8_t>> bus,
+	size_t startAddress, size_t endAddress) {
+
 	std::ofstream memDumpFile(MEM_DUMP_FILE_PATH, std::ofstream::out);
 	if (!memDumpFile.is_open()) {
 		fmt::print("Failed to open memdump.log file!\n");
@@ -90,9 +84,6 @@ void NesCore::runCPU_nInstructions(size_t nInstructions) {
 
 
 bool NesCore::loadCartridge(const char* filePath) {
-	IRam<uint16_t, uint8_t>* mainRom;
-	IRam<uint16_t, uint8_t>* otherRom;
-
 	std::streampos size;
 	uint8_t* memblock = nullptr;
 
@@ -118,10 +109,10 @@ bool NesCore::loadCartridge(const char* filePath) {
 	const uint16_t otherAddress = 0xC000;
 	const uint16_t romOffset = 0x0010;
 
-	mainRom = new NesArrayRam(0x4000);
-	otherRom = new NesArrayRam(0x4000);
-	m_cpuBus->addSlave(mainRom, baseAddress);
-	m_cpuBus->addSlave(otherRom, otherAddress);
+	m_mainRom = std::make_shared<NesArrayRam>(0x4000);
+	m_otherRom = std::make_shared<NesArrayRam>(0x4000);
+	m_cpuBus->addSlave(m_mainRom, baseAddress);
+	m_cpuBus->addSlave(m_otherRom, otherAddress);
 
 	for (int i = 0; i < 0x4000; i++) {
 		m_cpuBus->write(baseAddress + i, memblock[romOffset + i]);

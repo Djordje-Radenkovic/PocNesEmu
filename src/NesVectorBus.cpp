@@ -1,13 +1,7 @@
 #include "NesVectorBus.h"
 
 
-NesVectorBus::~NesVectorBus() { 
-	m_slaves.clear();
-	m_starts.clear();
-	m_ends.clear();
-}
-
-void NesVectorBus::addSlave(IBusSlave<uint16_t, uint8_t>* slaveToAdd,
+void NesVectorBus::addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slaveToAdd,
 	uint16_t startAddressToAdd, uint16_t endAddressToAdd) {
 
 	// Determine end address
@@ -27,15 +21,21 @@ void NesVectorBus::addSlave(IBusSlave<uint16_t, uint8_t>* slaveToAdd,
 	// Check for overlap with existing slaves
 	for (int i = 0; i < m_slaves.size(); i++) {
 		for (int j = 0; j < m_starts[i].size(); j++) {
-			if (endAddressToAdd >= m_starts[i][j] && endAddressToAdd <= m_ends[i][j]) {
+			if (endAddressToAdd >= m_starts[i][j]
+				&& endAddressToAdd <= m_ends[i][j]) {
+
 				throw std::range_error("Slave addresses overlaping");
 				return;
 			}
-			else if (startAddressToAdd >= m_starts[i][j] && startAddressToAdd <= m_ends[i][j]) {
+			else if (startAddressToAdd >= m_starts[i][j]
+				&& startAddressToAdd <= m_ends[i][j]) {
+
 				throw std::range_error("Slave addresses overlaping");
 				return;
 			}
-			else if (m_starts[i][j] >= startAddressToAdd && m_ends[i][j] <= endAddressToAdd) {
+			else if (m_starts[i][j] >= startAddressToAdd
+				&& m_ends[i][j] <= endAddressToAdd) {
+
 				throw std::range_error("Slave addresses overlaping");
 				return;
 			}
@@ -63,7 +63,8 @@ void NesVectorBus::addSlave(IBusSlave<uint16_t, uint8_t>* slaveToAdd,
 }
 
 
-IBusSlave<uint16_t, uint8_t>* NesVectorBus::getSlaveWithAddress(uint16_t address) {
+std::shared_ptr<IBusSlave<uint16_t, uint8_t>> 
+NesVectorBus::getSlaveWithAddress(uint16_t address) {
 	for (int i = 0; i < m_slaves.size(); i++) {
 		for (int j = 0; j < m_starts[i].size(); j++) {
 			if (address >= m_starts[i][j] && address <= m_ends[i][j]) {
