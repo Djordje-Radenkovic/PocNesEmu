@@ -2,8 +2,6 @@
 
 #include <map>
 
-#include "fmt/printf.h"
-
 #include "IBus.h"
 
 
@@ -20,7 +18,7 @@ public:
 		bool log = false, bool readOnly = false) override;
 
 	void dump_memory(const char* filePath,
-		size_t startAddress = 0, size_t endAddress = maxAddress) override;
+		uint16_t startAddress = 0, uint16_t endAddress = maxAddress) override;
 
 private:
 	uint16_t lastRetrievedStartAddress = 0;

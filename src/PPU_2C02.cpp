@@ -5,8 +5,15 @@ void PPU_2C02::connectBus(std::shared_ptr<IBus<uint16_t, uint8_t>> bus) {
 	m_bus = bus;
 }
 
-uint16_t PPU_2C02::size() {
-	return 0x8;
+void PPU_2C02::setAddressRange(uint16_t startAddress,
+	uint16_t endAddress) {
+	m_startAddress = startAddress;
+	m_endAddress = endAddress;
+}
+
+void PPU_2C02::setAddressRange(uint16_t startAddress) {
+	m_startAddress = startAddress;
+	m_endAddress = startAddress + m_size - 1;
 }
 
 uint8_t PPU_2C02::read(uint16_t address) {

@@ -1,4 +1,4 @@
-#include "fmt/core.h"
+#include "fmt/printf.h"
 
 #include "NesMultiMapBus.h"
 
@@ -107,7 +107,7 @@ uint8_t NesMultiMapBus::read(uint16_t address, bool log, bool readOnly) {
 }
 
 void NesMultiMapBus::dump_memory(const char* filePath,
-	size_t startAddress, size_t endAddress) {
+	uint16_t startAddress, uint16_t endAddress) {
 
 	m_memDumpFile.open(filePath, std::ofstream::out);
 

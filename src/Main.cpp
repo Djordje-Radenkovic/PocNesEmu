@@ -8,6 +8,7 @@
 #include "NesArrayRam.h"
 #include "NesMultiMapBus.h"
 #include "NesVectorBus.h"
+#include "NesVectorBus.h"
 
 
 int main(int argc, char** argv) {
@@ -20,8 +21,8 @@ int main(int argc, char** argv) {
 		std::make_shared<CPU_6502>(DEBUG_FILE_PATH),
 		std::make_shared<PPU_2C02>(),
 		std::make_shared<NesArrayRam>(0x0800),
-		std::make_shared<NesMultiMapBus>(),
-		std::make_shared<NesMultiMapBus>()
+		std::make_shared<NesVectorBus>(),
+		std::make_shared<NesVectorBus>()
 	);
 
 	// Run NesTest

@@ -2,9 +2,9 @@
 
 #include "IBusMaster.h"
 #include "IBusSlave.h"
-#include "IBus.h"
 
 
-class INesPpu : public IBusMaster<uint16_t, uint8_t>, public IBusSlave<uint16_t, uint8_t> {
+class INesPpu : public IBusMaster<uint16_t, uint8_t>,
+    public IBusSlave<uint16_t, uint8_t> {
 
 };

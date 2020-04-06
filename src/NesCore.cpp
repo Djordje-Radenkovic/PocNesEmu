@@ -18,10 +18,7 @@ NesCore::NesCore(
 	m_cpu->connectBus(m_cpuBus);
 
 	// Add the system RAM to the bus
-	m_cpuBus->addSlave(m_ram, 0x0000);
-	m_cpuBus->addSlave(m_ram, 0x0800);
-	m_cpuBus->addSlave(m_ram, 0x1000);
-	m_cpuBus->addSlave(m_ram, 0x1800);
+	m_cpuBus->addSlave(m_ram, 0x0000, 0x1800);
 
 	// Add the PPU to the CPU Bus
 	m_cpuBus->addSlave(m_ppu, 0x2000);
@@ -36,10 +33,10 @@ NesCore::NesCore(
 	m_ppuBus->addSlave(m_patternTable, 0x0000);
 	m_ppuBus->addSlave(m_nameTable, 0x2000);
 
-	// Add pallette RAM mirrored
-	for (int i = 0; i < 8; i++) {
-		m_ppuBus->addSlave(m_palletteRam, 0x3F00 + (i*0x20));
-	}
+	//// Add pallette RAM mirrored
+	//for (int i = 0; i < 8; i++) {
+	//	m_ppuBus->addSlave(m_palletteRam, 0x3F00 + (i*0x20));
+	//}
 }
 
 
@@ -69,7 +66,7 @@ bool NesCore::loadCartridge(const char* filePath) {
 		std::ios::binary | std::ios::in | std::ios::ate);
 
 	if (!nesTestRom.is_open()) {
-		fmt::print("Couldn't open ROM file!\n");;
+		fmt::print("Couldn't open ROM file!\n");
 
 		return 1;
 	}

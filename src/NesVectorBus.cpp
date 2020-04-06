@@ -1,100 +1,76 @@
+#include "fmt/printf.h"
+
 #include "NesVectorBus.h"
 
 
-void NesVectorBus::addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slaveToAdd,
-	uint16_t startAddressToAdd, uint16_t endAddressToAdd) {
+void NesVectorBus::addSlave(
+	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
+	uint16_t startAddress, uint16_t endAddress) {
 
-	// Determine end address
-	if (!endAddressToAdd) {
-		endAddressToAdd = startAddressToAdd + slaveToAdd->size() - 1;
-	}
+	// Check for valid address
 
-	// Check if addresses are in address space range
-	if (startAddressToAdd < 0 || startAddressToAdd > maxAddress
-		|| endAddressToAdd > maxAddress || endAddressToAdd <= 0 ||
-		endAddressToAdd <= startAddressToAdd) {
+	// Check for overlap
 
-		throw std::range_error("Invalid slave start and/or end address.");
-		return;
-	}
-
-	// Check for overlap with existing slaves
-	for (int i = 0; i < m_slaves.size(); i++) {
-		for (int j = 0; j < m_starts[i].size(); j++) {
-			if (endAddressToAdd >= m_starts[i][j]
-				&& endAddressToAdd <= m_ends[i][j]) {
-
-				throw std::range_error("Slave addresses overlaping");
-				return;
-			}
-			else if (startAddressToAdd >= m_starts[i][j]
-				&& startAddressToAdd <= m_ends[i][j]) {
-
-				throw std::range_error("Slave addresses overlaping");
-				return;
-			}
-			else if (m_starts[i][j] >= startAddressToAdd
-				&& m_ends[i][j] <= endAddressToAdd) {
-
-				throw std::range_error("Slave addresses overlaping");
-				return;
-			}
-		}
-	}
-
-	// Check if slave already exists
-	for (int i = 0; i < m_slaves.size(); i++) {
-		if (m_slaves[i] == slaveToAdd) {
-			existingIndex = i;
-			break;
-		}
-	}
-
-	// Add slave
-	if (existingIndex != -1) {
-		m_starts[existingIndex].push_back(startAddressToAdd);
-		m_ends[existingIndex].push_back(endAddressToAdd);
-	}
-	else {
-		m_slaves.push_back(slaveToAdd);
-		m_starts.push_back({ startAddressToAdd });
-		m_ends.push_back({ endAddressToAdd });
-	}
+	slave->setAddressRange(startAddress, endAddress);
+	m_slaves.push_back(slave);
 }
 
+void NesVectorBus::addSlave(
+	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
+	uint16_t startAddress) {
 
-std::shared_ptr<IBusSlave<uint16_t, uint8_t>> 
+	// Check for valid address
+
+	// Check for overlap
+
+	slave->setAddressRange(startAddress);
+	m_slaves.push_back(slave);
+}
+
+std::shared_ptr<IBusSlave<uint16_t, uint8_t>>
 NesVectorBus::getSlaveWithAddress(uint16_t address) {
 	for (int i = 0; i < m_slaves.size(); i++) {
-		for (int j = 0; j < m_starts[i].size(); j++) {
-			if (address >= m_starts[i][j] && address <= m_ends[i][j]) {
-				lastRetrievedStartAddress = m_starts[i][j];
-				return m_slaves[i];
-			}
-		}
+		if (address >= m_slaves[i]->startAddress() && address <= m_slaves[i]->endAddress())
+			return m_slaves[i];
 	}
 
 	return nullptr;
 }
 
-
 bool NesVectorBus::write(uint16_t address, uint8_t data, bool log) {
 	m_tempSlave = getSlaveWithAddress(address);
-	if (m_tempSlave == nullptr) {
+	if (m_tempSlave == nullptr)
 		return false;
-	}
 
-	m_tempSlave->write(address % m_tempSlave->size(), data);
-
+	m_tempSlave->write(address, data);
+	
 	return true;
 }
 
-
-uint8_t NesVectorBus::read(uint16_t address, bool log, bool readonly) {
+uint8_t NesVectorBus::read(uint16_t address, bool log, bool readOnly) {
 	m_tempSlave = getSlaveWithAddress(address);
-	if (m_tempSlave == nullptr) {
+	if (m_tempSlave == nullptr)
 		return -1;
+	
+	return m_tempSlave->read(address);
+}
+
+void NesVectorBus::dump_memory(const char* filePath,
+	uint16_t startAddress, uint16_t endAddress) {
+
+	m_memDumpFile.open(filePath, std::ofstream::out);
+
+	if (!m_memDumpFile.is_open()) {
+		fmt::print("Failed to open memdump.log file!\n");
+		return;
 	}
 
-	return m_tempSlave->read(address % m_tempSlave->size());
+	for (int i = 0; i <= 0xFFFF; i++) {
+		if (i % 0x10 == 0) {
+			fmt::fprintf(m_memDumpFile, "\n0x%04X: ", i);
+		}
+		fmt::fprintf(m_memDumpFile, "%02X ", read(i));
+	}
+	m_memDumpFile.close();
+	fmt::printf("Dumped memory to disk ($%04X-$%04X).\n", startAddress, endAddress);
 }

@@ -10,7 +10,10 @@ template <typename addressWidth, typename dataWidth>
 class IBus {
 public:
 	virtual void addSlave(std::shared_ptr<IBusSlave<addressWidth, dataWidth>> slave,
-		addressWidth startAddress, addressWidth endAddress = 0) = 0;
+		addressWidth startAddress, addressWidth endAddress) = 0;
+
+	virtual void addSlave(std::shared_ptr<IBusSlave<addressWidth, dataWidth>> slave,
+		addressWidth startAddress) = 0;
 
 	virtual std::shared_ptr<IBusSlave<addressWidth, dataWidth>>
 		getSlaveWithAddress(addressWidth address) = 0;
@@ -20,7 +23,7 @@ public:
 		bool log = false, bool readOnly = false) = 0;
 
 	virtual void dump_memory(const char* filePath,
-		size_t startAddress = 0, size_t endAddresss = maxAddress) = 0;
+		addressWidth startAddress = 0, addressWidth endAddresss = maxAddress) = 0;
 
 protected:
 	static const size_t maxAddress = std::numeric_limits<addressWidth>::max();
