@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\IMapper.h" />
+    <ClInclude Include="src\Mapper_000.h" />
     <ClInclude Include="src\NesMultiMapBus.h" />
     <ClInclude Include="src\CPU_6502.h" />
     <ClInclude Include="src\Config.h" />

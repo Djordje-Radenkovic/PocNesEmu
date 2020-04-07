@@ -40,6 +40,7 @@ public:
 	bool isFinished() override;
 
 	void reset() override;
+	void reset(uint16_t pc) override;
 	void irq()	 override;
 	void nmi()	 override;
 	void tick()	 override;

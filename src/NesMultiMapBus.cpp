@@ -91,7 +91,7 @@ bool NesMultiMapBus::write(uint16_t address, uint8_t data) {
 	if (m_tempSlave == nullptr)
 		return false;
 
-	m_tempSlave->write(address % m_tempSlave->size(), data);
+	m_tempSlave->write(address, data);
 
 	return true;
 }
@@ -103,7 +103,7 @@ uint8_t NesMultiMapBus::read(uint16_t address) {
 	if (m_tempSlave == nullptr)
 		return -1;
 
-	return m_tempSlave->read(address % m_tempSlave->size());
+	return m_tempSlave->read(address);
 }
 
 

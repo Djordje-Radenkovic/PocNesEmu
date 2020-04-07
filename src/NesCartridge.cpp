@@ -29,8 +29,7 @@ NesCartridge::NesCartridge(const char* romFilePath) {
 	// TODO: Do this instead of hard coding 1
 	m_fileType = 1;
 
-	switch (m_fileType)
-	{
+	switch (m_fileType) {
 	case 0:
 		fmt::print("iNES file type 0 not implemented!");
 		break;
@@ -55,6 +54,17 @@ NesCartridge::NesCartridge(const char* romFilePath) {
 		break;
 	}
 
+	// Load appropriate mapper
+	switch (m_mapperID) {
+	case 0:
+		m_mapper = std::make_shared<Mapper_000>(m_PRGBanks, m_CHRBanks);
+		break;
+	default:
+		fmt::print("Unsuported mapper type!");
+		break;
+	}
+
+
 	romFile.close();
 }
 
@@ -68,15 +78,30 @@ NesCartridge::~NesCartridge() {
 }
 
 
-// TEMP
+uint8_t NesCartridge::read(uint16_t address) {
+	// PPU Read
+	if (address >= 0x0000 && address <= 0x1FFF)
+		return m_CHRMemory[m_mapper->mapRead(address)];
+	
+	// CPU Read
+	if (address >= 0x8000 && address <= 0xFFFF)
+		return m_PRGMemory[m_mapper->mapRead(address)];
+}
+
+
+void NesCartridge::write(uint16_t address, uint8_t data) {
+	// PPU Write
+	if (address >= 0x0000 && address <= 0x1FFF)
+		m_PRGMemory[m_mapper->mapWrite(address)] = data;
+
+	// CPU Write
+	if (address >= 0x8000 && address <= 0xFFFF)
+		m_CHRMemory[m_mapper->mapWrite(address)] = data;
+}
+
+
+// TODO: Fix this to somehow return the size?
 inline const uint16_t NesCartridge::size() {
 	return 0;
 }
 
-uint8_t NesCartridge::read(uint16_t address) {
-	return 0;
-}
-
-void NesCartridge::write(uint16_t address, uint8_t data) {
-
-}

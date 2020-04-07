@@ -5,6 +5,8 @@
 #include "IBusSlave.h"
 #include "NesRom.h"
 
+#include "Mapper_000.h"
+
 
 class NesCartridge : public IBusSlave<uint16_t, uint8_t> {
 public:
@@ -19,8 +21,9 @@ public:
 	// --------------
 
 private:
+	std::shared_ptr<IMapper> m_mapper;
 	romHeader m_header;
-	uint8_t m_fileType;
+	uint8_t m_fileType = 0;
 
 	uint8_t* m_PRGMemory = nullptr;
 	uint16_t m_PRGMemorySize = 0;

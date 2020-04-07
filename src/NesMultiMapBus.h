@@ -14,9 +14,6 @@ public:
 	void addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
 		uint16_t startAddress) override;
 
-	void m_addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
-		uint16_t startAddress, uint16_t endAddress);
-
 	void getSlaveWithAddress(uint16_t address) override;
 
 	bool write(uint16_t address, uint8_t data) override;
@@ -24,6 +21,10 @@ public:
 
 	void dump_memory(const char* filePath,
 		uint16_t startAddress = 0, uint16_t endAddress = maxAddress) override;
+
+private:
+	void m_addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
+		uint16_t startAddress, uint16_t endAddress);
 
 private:
 	uint16_t lastRetrievedStartAddress = 0;

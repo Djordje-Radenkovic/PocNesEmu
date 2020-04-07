@@ -28,6 +28,9 @@
     <Filter Include="Config">
       <UniqueIdentifier>{e7b6bbec-6a95-45c4-ad30-cd1fbaac60f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ROM\Mappers">
+      <UniqueIdentifier>{b88c68d3-0b35-45ff-ad56-2715d9e64034}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NesCore.h" />
@@ -75,6 +78,12 @@
     </ClInclude>
     <ClInclude Include="src\NesRom.h">
       <Filter>ROM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IMapper.h">
+      <Filter>ROM\Mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mapper_000.h">
+      <Filter>ROM\Mappers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

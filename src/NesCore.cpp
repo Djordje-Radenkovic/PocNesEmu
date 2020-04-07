@@ -3,7 +3,7 @@
 #include "fmt/printf.h"
 
 #include "NesCore.h"
-#include "Config.h"
+#include "NesCartridge.h"
 
 
 NesCore::NesCore(
@@ -20,7 +20,7 @@ NesCore::NesCore(
 	m_cpu->connectBus(m_cpuBus);
 
 	// Add the system RAM to the bus
-	m_cpuBus->addSlave(m_ram, 0x0000, 0x1800);
+	m_cpuBus->addSlave(m_ram, 0x0000, 0x17FF);
 
 	// Add the PPU to the CPU Bus
 	m_cpuBus->addSlave(m_ppu, 0x2000, 0x3FFF);
@@ -33,9 +33,23 @@ NesCore::NesCore(
 	m_nameTable	   = std::make_shared<NesArrayRam>(0x1000);
 	m_palletteRam  = std::make_shared<NesArrayRam>(0x20);
 
-	m_ppuBus->addSlave(m_patternTable, 0x0000);
+	//// Do this only if cartridge doesn't provide it
+	//m_ppuBus->addSlave(m_patternTable, 0x0000);
+
 	m_ppuBus->addSlave(m_nameTable, 0x2000, 0x3EFF);
 	m_ppuBus->addSlave(m_palletteRam, 0x3F00, 0x3FFF);
+}
+
+
+void NesCore::powerOn() {
+	isOn = true;
+
+	reset();
+
+	while (isOn)
+		tick();
+
+	powerOff();
 }
 
 
@@ -46,14 +60,42 @@ void NesCore::reset() {
 
 
 bool NesCore::loadCartridge(const char* filePath) {
+	// Construct Cartridge (which also loads file into it)
+	m_cartridge = std::make_shared<NesCartridge>(filePath);
+
+	// Connect Cartridge to Buses
+	m_cpuBus->addSlave(m_cartridge, 0x8000, 0xFFFF);
+	m_ppuBus->addSlave(m_cartridge, 0x0000, 0x1FFF);
+
 	return true;
 }
 
+
+void NesCore::tick() {
+	// PPU clocks 3 times faster than the CPU
+	
+	// Clock CPU
+	m_cpu->tick();
+
+	// Clock PPU 3 times?
+	//m_ppu->tick();	m_ppu->tick();	m_ppu->tick();
+
+	// Maybe stop execution?
+	/*	if (<exit condition>)
+	 *		isOn = false;
+	 */
+}
+
+
+void NesCore::powerOff() {
+	// Some cleanup here
+}
 
 
 //	+---------------------------+
 //	|	Testing/Debug Methods	|
 //	+---------------------------+
+
 
 void NesCore::runCPU_nCycles(size_t nCycles) {
 	m_cpu->reset();
@@ -62,6 +104,12 @@ void NesCore::runCPU_nCycles(size_t nCycles) {
 	} while (m_cpu->getCyclesPassed() <= nCycles);
 }
 
+void NesCore::runCPU_nCycles(size_t nCycles, uint16_t pc) {
+	m_cpu->reset(pc);
+	do {
+		m_cpu->tick();
+	} while (m_cpu->getCyclesPassed() <= nCycles);
+}
 
 void NesCore::runCPU_nInstructions(size_t nInstructions) {
 	m_cpu->reset();
@@ -72,53 +120,24 @@ void NesCore::runCPU_nInstructions(size_t nInstructions) {
 	} while (nInstructions > 0);
 }
 
+void NesCore::runCPU_nInstructions(size_t nInstructions, uint16_t pc) {
+	m_cpu->reset(pc);
+	do {
+		m_cpu->tick();
+		if (m_cpu->isFinished())
+			nInstructions--;
+	} while (nInstructions > 0);
+}
 
-void NesCore::nesTest() {
-	// Load ROM
-	std::streampos size;
-	uint8_t* memblock = nullptr;
 
-	std::ifstream nesTestRom(NESTEST_FILE_PATH,
-		std::ios::binary | std::ios::in | std::ios::ate);
-
-	if (!nesTestRom.is_open()) {
-		fmt::print("Couldn't open ROM file!\n");
-
-		return;
-	}
-
-	size = nesTestRom.tellg();
-	memblock = new uint8_t[size];
-	nesTestRom.seekg(0, std::ios::beg);
-	nesTestRom.read((char*)memblock, size);
-	const int romSize = nesTestRom.gcount();
-	nesTestRom.close();
-
-	fmt::print("ROM file read.\n");
-
-	const uint16_t baseAddress = 0x8000;
-	const uint16_t otherAddress = 0xC000;
-	const uint16_t romOffset = 0x0010;
-
-	m_cartridge = std::make_shared<NesArrayRam>(0x4000);
-	m_cpuBus->addSlave(m_cartridge, 0x8000, 0xFFFF);
-
-	for (int i = 0; i < 0x4000; i++) {
-		m_cartridge->write(i, memblock[romOffset + i]);
-	}
-
-	delete[] memblock;
-
-	fmt::print("ROM loaded into memory.\n");
-
-	// Write reset vector
-	m_cpuBus->write(0xFFFC, 0x00);
-	m_cpuBus->write(0xFFFD, 0xC0);
+void NesCore::nesTest(const char* romFilePath, const char* memDumpFilePath) {
+	loadCartridge(romFilePath);
 
 	// Run the CPU
-	runCPU_nCycles(26554);		// NESTest runs for 26554 cycles
+	runCPU_nCycles(26554, 0xC000);		// NESTest runs for 26554 cycles
+										// starting from address $C000
 
 	// Memory dump
 	fmt::print("\n");
-	m_cpuBus->dump_memory(MEM_DUMP_FILE_PATH);
+	m_cpuBus->dump_memory(memDumpFilePath);
 }

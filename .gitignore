@@ -338,3 +338,9 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+# NES ROM files except NesTest
+*.nes
+roms/*
+!nestest.nes
+!roms/nestest.nes

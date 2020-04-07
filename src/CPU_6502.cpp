@@ -65,6 +65,27 @@ void CPU_6502::reset() {
 	cycles = 7;
 }
 
+void CPU_6502::reset(uint16_t pc) {
+	size_t totalCyclesPassed = 0;
+
+	// Set Program Counter to reset address
+	PC = pc;
+
+	// Reset registers to known state
+	A = 0;	X = 0;	Y = 0;
+	SP = 0xFD;
+	PS.data = 0x24;
+
+	// Reset helper variables
+	addressAbsolute = 0x0000;
+	addressRelative = 0x0000;
+	fetchedData = 0x00;
+
+	// Reset takes 7 cycles
+	cycles = 7;
+}
+
+
 // Interrupt Request
 void CPU_6502::irq() {
 	if (PS.ID == 0) {

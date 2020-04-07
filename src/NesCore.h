@@ -19,8 +19,10 @@ public:
 	);
 
 
-	void nesTest();
+	void nesTest(const char* romFilePath, const char* memDumpFilePath);
 
+	void powerOn();
+	void powerOff();
 	bool loadCartridge(const char* filePath);
 	void reset();
 	void tick();
@@ -34,7 +36,8 @@ private:
 
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_ram;
 
-	std::shared_ptr<IRam<uint16_t, uint8_t>> m_cartridge;
+	std::shared_ptr<IRam<uint16_t, uint8_t>> m_simpleRom;
+	std::shared_ptr<NesCartridge> m_cartridge;
 
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_patternTable;
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_nameTable;
@@ -43,8 +46,11 @@ private:
 private:
 	void runCPU_nCycles(size_t nCycles);
 	void runCPU_nInstructions(size_t nInstructions);
+	void runCPU_nCycles(size_t nCycles, uint16_t pc);
+	void runCPU_nInstructions(size_t nInstructions, uint16_t pc);
 
 private:
+	bool isOn = false;
 	size_t totalCyclesPassed = 0;
 
 };
