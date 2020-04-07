@@ -3,10 +3,22 @@
 
 void PPU_2C02::connectBus(std::shared_ptr<IBus<uint16_t, uint8_t>> bus) {
 	m_bus = bus;
+	m_busConnected = true;
 }
 
+
+void PPU_2C02::reset() {
+	
+}
+
+
+void PPU_2C02::tick() {
+
+}
+
+
 uint8_t PPU_2C02::read(uint16_t address) {
-	switch(address) {
+	switch(address % m_size) {
 	case 0x0000:	// Control
 		break;
 	case 0x0001:	// Mask
@@ -28,8 +40,9 @@ uint8_t PPU_2C02::read(uint16_t address) {
 	return -1;
 }
 
+
 void PPU_2C02::write(uint16_t address, uint8_t data) {
-	switch (address) {
+	switch (address % m_size) {
 	case 0x0000:	// Control
 		break;
 	case 0x0001:	// Mask

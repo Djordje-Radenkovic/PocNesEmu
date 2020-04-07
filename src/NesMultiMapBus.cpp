@@ -14,7 +14,7 @@ void NesMultiMapBus::addSlave(
 void NesMultiMapBus::addSlave(
 	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
 	uint16_t startAddress) {
-	
+
 	uint16_t endAddress = startAddress + slave->size() - 1;
 	m_addSlave(slave, startAddress, endAddress);
 }

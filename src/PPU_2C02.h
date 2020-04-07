@@ -8,13 +8,11 @@
 
 class PPU_2C02 final : public INesPpu {
 public:
-	PPU_2C02() {
-		m_size = 0x8;
-		m_startAddress = 0;
-		m_endAddress   = 0;
-	}
+	PPU_2C02() : m_size(8) {}
 
-	void tick();
+
+	void reset() override;
+	void tick() override;
 
 
 	// From IBusMaster
@@ -40,10 +38,9 @@ private:
 	//	--------------
 
 private:
-	uint16_t m_size = 0x8;
-	uint16_t m_startAddress;
-	uint16_t m_endAddress;
-
+	bool m_busConnected = false;
+	uint16_t m_size { 0x8 };
 	uint8_t m_tempData = 0x00;
+	uint8_t m_pallette[0x20];
 
 };

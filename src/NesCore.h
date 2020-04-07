@@ -50,7 +50,10 @@ private:
 	void runCPU_nInstructions(size_t nInstructions, uint16_t pc);
 
 private:
-	bool isOn = false;
-	size_t totalCyclesPassed = 0;
+	bool m_realTime = true;
+	long double m_deltaTime = 0.0L;
+
+	bool m_isOn = false;
+	size_t m_totalCyclesPassed = 0;
 
 };

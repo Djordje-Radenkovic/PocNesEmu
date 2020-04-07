@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 
 #include "fmt/printf.h"
 
@@ -14,7 +15,7 @@ NesCore::NesCore(
 	std::shared_ptr<IBus<uint16_t, uint8_t>> ppuBus
 ) : m_cpu(cpu), m_ppu(ppu), m_ram(ram), m_cpuBus(cpuBus), m_ppuBus(ppuBus) {
 
-	totalCyclesPassed = 0;
+	m_totalCyclesPassed = 0;
 
 	// Connect CPU to its bus
 	m_cpu->connectBus(m_cpuBus);
@@ -42,19 +43,27 @@ NesCore::NesCore(
 
 
 void NesCore::powerOn() {
-	isOn = true;
+	m_isOn = true;
 
 	reset();
 
-	while (isOn)
-		tick();
+	if (m_realTime) {
+		while (m_isOn)
+			tick();
+	}
+	else {
+		while (m_isOn) {
+			tick();
+			std::cin.get();
+		}
+	}
 
 	powerOff();
 }
 
 
 void NesCore::reset() {
-	totalCyclesPassed = 0;
+	m_totalCyclesPassed = 0;
 	m_cpu->reset();
 }
 
@@ -72,13 +81,27 @@ bool NesCore::loadCartridge(const char* filePath) {
 
 
 void NesCore::tick() {
-	// PPU clocks 3 times faster than the CPU
-	
-	// Clock CPU
-	m_cpu->tick();
+	/*	// MOVE THIS INTO PPUs tick()
+	 *
+	 *	// Draw pixel
+	 *	drawPixel(m_cycle-1, scanline, color);
+	 *
+	 *	if (m_cycle >= 341) {
+	 *		m_cycle = 0;
+	 *		scanline++;
+	 *		if (scanline >= 261) {
+	 *			scanline = -1;
+	 *			frameComplete = true;
+	 *		}
+	 *	}
+	 */
 
-	// Clock PPU 3 times?
-	//m_ppu->tick();	m_ppu->tick();	m_ppu->tick();
+	// PPU clocks 3 times faster than the CPU
+	m_ppu->tick();
+	if (m_totalCyclesPassed % 3 == 0)
+		m_cpu->tick();
+
+	m_totalCyclesPassed++;
 
 	// Maybe stop execution?
 	/*	if (<exit condition>)
@@ -92,10 +115,11 @@ void NesCore::powerOff() {
 }
 
 
+
+
 //	+---------------------------+
 //	|	Testing/Debug Methods	|
 //	+---------------------------+
-
 
 void NesCore::runCPU_nCycles(size_t nCycles) {
 	m_cpu->reset();
