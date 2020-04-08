@@ -9,10 +9,10 @@
 template <typename addressWidth, typename dataWidth>
 class IBus {
 public:
-	virtual void addSlave(std::shared_ptr<IBusSlave<addressWidth, dataWidth>> slave,
+	virtual void mapSlave(std::shared_ptr<IBusSlave<addressWidth, dataWidth>> slave,
 		addressWidth startAddress, addressWidth endAddress) = 0;
 
-	virtual void addSlave(std::shared_ptr<IBusSlave<addressWidth, dataWidth>> slave,
+	virtual void mapSlave(std::shared_ptr<IBusSlave<addressWidth, dataWidth>> slave,
 		addressWidth startAddress) = 0;
 
 	virtual void getSlaveWithAddress(addressWidth address) = 0;

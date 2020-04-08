@@ -3,7 +3,7 @@
 #include "NesMultiMapBus.h"
 
 
-void NesMultiMapBus::addSlave(
+void NesMultiMapBus::mapSlave(
 	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
 	uint16_t startAddress, uint16_t endAddress) {
 
@@ -11,7 +11,7 @@ void NesMultiMapBus::addSlave(
 }
 
 
-void NesMultiMapBus::addSlave(
+void NesMultiMapBus::mapSlave(
 	std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
 	uint16_t startAddress) {
 

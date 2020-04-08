@@ -85,6 +85,9 @@
     <ClInclude Include="src\Mapper_000.h">
       <Filter>ROM\Mappers</Filter>
     </ClInclude>
+    <ClInclude Include="src\PPU_2C02_Pallette_000.h">
+      <Filter>PPU</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />

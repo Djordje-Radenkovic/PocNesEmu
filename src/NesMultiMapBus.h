@@ -8,10 +8,10 @@
 
 class NesMultiMapBus : public IBus<uint16_t, uint8_t> {
 public:
-	void addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
+	void mapSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
 		uint16_t startAddress, uint16_t endAddress) override;
 
-	void addSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
+	void mapSlave(std::shared_ptr<IBusSlave<uint16_t, uint8_t>> slave,
 		uint16_t startAddress) override;
 
 	void getSlaveWithAddress(uint16_t address) override;

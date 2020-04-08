@@ -20,6 +20,13 @@ public:
 	void write(uint16_t address, uint8_t data) override;
 	// --------------
 
+	enum MIRROR_MODE {
+		VERTICAL,
+		HORIZONTAL,
+		ONE_SCREEN,
+		FOUR_SCREEN
+	} mirrorMode = HORIZONTAL;
+
 private:
 	std::shared_ptr<IMapper> m_mapper;
 	romHeader m_header;

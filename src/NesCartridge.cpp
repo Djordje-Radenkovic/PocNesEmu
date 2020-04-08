@@ -22,13 +22,15 @@ NesCartridge::NesCartridge(const char* romFilePath) {
 	if (m_header.mapper1 & 0x04)
 		romFile.seekg(512, std::ios_base::cur);
 
-	// Set mapper information
+	// Set mapper and mirroring information
 	m_mapperID = ((m_header.mapper2 >> 4) << 4 | (m_header.mapper1 >> 4));
+	mirrorMode = (m_header.mapper1 & 0x01) ? VERTICAL : HORIZONTAL;
 
 	// Get type of iNES file
 	// TODO: Do this instead of hard coding 1
 	m_fileType = 1;
 
+	// TODO: Implement more file type handlers
 	switch (m_fileType) {
 	case 0:
 		fmt::print("iNES file type 0 not implemented!");

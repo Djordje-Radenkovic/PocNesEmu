@@ -1,5 +1,7 @@
 #include <memory>
 
+#include "sdl/SDL.h"
+
 #include "Config.h"
 #include "filesystem.h"
 #include "NesCore.h"
@@ -25,6 +27,7 @@ int main(int argc, char** argv) {
 
 	// Run NesTest
 	nes.nesTest(NESTEST_FILE_PATH, MEM_DUMP_FILE_PATH);
+
 
 	return 0;
 }

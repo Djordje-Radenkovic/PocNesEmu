@@ -9,6 +9,10 @@ class INesPpu : public IBusMaster<uint16_t, uint8_t>,
 
 public:
     virtual void reset() = 0;
-    virtual void tick() = 0;
+    virtual void tick()  = 0;
+
+    virtual bool isRunning() = 0;
+    virtual bool getNmi()    = 0;
+    virtual void clearNmi()  = 0;
 
 };

@@ -19,7 +19,8 @@ public:
 	);
 
 
-	void nesTest(const char* romFilePath, const char* memDumpFilePath);
+	void nesTest(const char* romFilePath, const char* memDumpFilePath,
+				 bool noPpu = true);
 
 	void powerOn();
 	void powerOff();
@@ -40,7 +41,8 @@ private:
 	std::shared_ptr<NesCartridge> m_cartridge;
 
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_patternTable;
-	std::shared_ptr<IRam<uint16_t, uint8_t>> m_nameTable;
+	std::shared_ptr<IRam<uint16_t, uint8_t>> m_nameTable0;
+	std::shared_ptr<IRam<uint16_t, uint8_t>> m_nameTable1;
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_palletteRam;
 
 private:
