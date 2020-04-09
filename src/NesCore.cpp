@@ -127,12 +127,13 @@ void NesCore::tick() {
 	// If some component isn't running
 	// stop the NES
 	if (!m_ppu->isRunning())
-		m_isOn = false;
+		powerOff();
 }
 
 
 void NesCore::powerOff() {
 	// Some cleanup here
+	m_isOn = false;
 }
 
 
@@ -189,4 +190,5 @@ void NesCore::nesTest(const char* romFilePath, const char* memDumpFilePath,
 	// Memory dump
 	fmt::print("\n");
 	m_cpuBus->dump_memory(memDumpFilePath);
+	m_ppuBus->dump_memory("./logs/ppudump.log");
 }

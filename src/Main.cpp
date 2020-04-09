@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	);
 
 	// Run NesTest
-	nes.nesTest(NESTEST_FILE_PATH, MEM_DUMP_FILE_PATH);
+	nes.nesTest(DK_ROM_FILE_PATH, MEM_DUMP_FILE_PATH, false);
 
 
 	return 0;

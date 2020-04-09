@@ -4,7 +4,7 @@
 
 #include "CPU_6502.h"
 
-# define _DEBUG_LOG
+//#define _DEBUG_LOG
 
 #ifdef _DEBUG_LOG
 void CPU_6502::log() {
