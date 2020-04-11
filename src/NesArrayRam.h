@@ -20,7 +20,7 @@ public:
 		return m_size;
 	}
 
-	uint8_t read(uint16_t address) override {
+	uint8_t read(uint16_t address, bool readOnly = false) override {
 		return m_data[address % m_size];
 	}
 

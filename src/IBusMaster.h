@@ -11,6 +11,7 @@ public:
 
 protected:
 	std::shared_ptr<IBus<addressWidth, dataWidth>> m_bus = nullptr;
-	virtual inline dataWidth readFrom(addressWidth address) = 0;
+	virtual inline dataWidth readFrom(addressWidth address,
+		bool readOnly = false) = 0;
 	virtual inline void writeTo(addressWidth address, dataWidth data) = 0;
 };

@@ -18,7 +18,7 @@ public:
 	virtual void getSlaveWithAddress(addressWidth address) = 0;
 
 	virtual bool write(addressWidth address, dataWidth data) = 0;
-	virtual dataWidth read(addressWidth address) = 0;
+	virtual dataWidth read(addressWidth address, bool readOnly = false) = 0;
 
 	virtual void dump_memory(const char* filePath,
 		addressWidth startAddress = 0, addressWidth endAddresss = maxAddress) = 0;

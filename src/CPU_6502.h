@@ -39,8 +39,8 @@ public:
 	inline const size_t getCyclesPassed() override { return totalCyclesPassed; }
 	bool isFinished() override;
 
-	void reset() override;
 	void reset(uint16_t pc) override;
+	void reset() override;
 	void irq()	 override;
 	void nmi()	 override;
 	void tick()	 override;
@@ -108,8 +108,8 @@ private:
 	//			+--------------------+
 	//			|  Bus Functionality |
 	//			+--------------------+
-	inline uint8_t readFrom(uint16_t address) override {
-		return m_bus->read(address);
+	inline uint8_t readFrom(uint16_t address, bool readOnly = false) override {
+		return m_bus->read(address, readOnly);
 	}
 
 	inline void writeTo(uint16_t address, uint8_t data) override {

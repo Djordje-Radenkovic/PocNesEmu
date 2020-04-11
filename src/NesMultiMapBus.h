@@ -17,7 +17,7 @@ public:
 	void getSlaveWithAddress(uint16_t address) override;
 
 	bool write(uint16_t address, uint8_t data) override;
-	uint8_t read(uint16_t address) override;
+	uint8_t read(uint16_t address, bool readOnly = false) override;
 
 	void dump_memory(const char* filePath,
 		uint16_t startAddress = 0, uint16_t endAddress = maxAddress) override;

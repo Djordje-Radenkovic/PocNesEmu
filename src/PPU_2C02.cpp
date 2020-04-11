@@ -16,8 +16,28 @@ PPU_2C02::PPU_2C02() : m_size(8) {
 	);
 
 	m_renderer = SDL_CreateRenderer(m_window, -1, 0);
-	m_screen = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, 256, 240);
-	m_screenBuffer = new SDL_Color[256*240];
+	m_screen = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_RGBA32,
+		SDL_TEXTUREACCESS_STREAMING, 256, 240);
+	m_screenBuffer = new SDL_Color[256 * 240];
+	
+	m_patternWindow = SDL_CreateWindow(
+		"POCNESEMU - Pattern Tables",
+		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+		512, 480, NULL
+	);
+
+	m_patternRenderer = SDL_CreateRenderer(m_patternWindow, 0, 0);
+	m_patternScreen = SDL_CreateTexture(m_patternRenderer, SDL_PIXELFORMAT_RGBA32,
+		SDL_TEXTUREACCESS_STREAMING, 256, 240);
+	m_patternBuffer = new SDL_Color[256 * 240];
+
+	// Set "At Power" internal state
+	PPU_CTRL.data = 0x00;
+	PPU_MASK.data = 0x00;
+	PPU_STATUS.data = 0xA0;
+	addressLatch = 0;
+	ppuAddress = 0x0000;
+	dataBuffer = 0x00;
 }
 
 
@@ -30,6 +50,14 @@ PPU_2C02::~PPU_2C02() {
 		SDL_DestroyTexture(m_screen);
 	if (m_screenBuffer != nullptr)
 		delete[] m_screenBuffer;
+	if (m_patternRenderer != nullptr)
+		SDL_DestroyRenderer(m_patternRenderer);
+	if (m_patternWindow != nullptr)
+		SDL_DestroyWindow(m_patternWindow);
+	if (m_patternScreen != nullptr)
+		SDL_DestroyTexture(m_patternScreen);
+	if (m_patternBuffer != nullptr)
+		delete[] m_patternBuffer;
 
 	SDL_Quit();
 }
@@ -55,56 +83,33 @@ void PPU_2C02::connectBus(std::shared_ptr<IBus<uint16_t, uint8_t>> bus) {
 
 
 void PPU_2C02::reset() {
+	// Set "After Reset" internal state
+	PPU_CTRL.data = 0x00;
+	PPU_MASK.data = 0x00;
+	PPU_STATUS.data = 0xA0;
+	addressLatch = 0;
+	dataBuffer = 0x00;
+
 	m_cycle = 0;
 	m_isRunning = true;
-	SDL_Color rm_pallette[4] = {
-		{0, 0, 0, 255},
-		{100, 50, 0, 255},
-		{50, 100, 0, 255},
-		{0, 50, 100, 255}
-	};
 
-	for (int tileY = 0; tileY < 16; tileY++) {
-		for (int tileX = 0; tileX < 16; tileX++) {
-			int offset = tileY * 256 + tileX * 16;
-
-			for (int row = 0; row < 8; row++) {
-				int tile_lsb = m_bus->read(offset + row + 0);
-				int tile_msb = m_bus->read(offset + row + 8);
-
-				for (int col = 0; col < 8; col++) {
-					int pixel = (tile_lsb & 0x01)
-						+ (tile_msb & 0x01);
-					tile_lsb >>= 1; tile_msb >>= 1;
-
-					m_screenBuffer[tileX * 8 + (7 - col) +
-						(tileY * 8 + row) * 256] =
-						rm_pallette[pixel];
-				}
-			}
-		}
+	// Initialize screen buffer with a value and render it
+	for (int i = 0; i < 256 * 240; i++) {
+		m_screenBuffer[i] = m_palette[0x0F];
+	}
+	
+	for (int i = 0; i < 256 * 240; i++) {
+		m_patternBuffer[i] = m_palette[0x0F];
 	}
 
-	for (int tileY = 0; tileY < 16; tileY++) {
-		for (int tileX = 0; tileX < 16; tileX++) {
-			int offset = tileY * 256 + tileX * 16;
+	SDL_UpdateTexture(m_screen, NULL, m_screenBuffer, sizeof(SDL_Color) * 256);
+	SDL_RenderCopy(m_renderer, m_screen, NULL, NULL);
+	SDL_RenderPresent(m_renderer);
 
-			for (int row = 0; row < 8; row++) {
-				int tile_lsb = m_bus->read(0x1000 + offset + row + 0);
-				int tile_msb = m_bus->read(0x1000 + offset + row + 8);
 
-				for (int col = 0; col < 8; col++) {
-					int pixel = (tile_lsb & 0x01)
-						+ (tile_msb & 0x01);
-					tile_lsb >>= 1; tile_msb >>= 1;
-
-					m_screenBuffer[128 + tileX * 8 + (7 - col) +
-						(tileY * 8 + row) * 256] =
-						rm_pallette[pixel];
-				}
-			}
-		}
-	}
+	SDL_UpdateTexture(m_patternScreen, NULL, m_patternBuffer, sizeof(SDL_Color) * 256);
+	SDL_RenderCopy(m_patternRenderer, m_patternScreen, NULL, NULL);
+	SDL_RenderPresent(m_patternRenderer);
 }
 
 
@@ -120,29 +125,6 @@ void PPU_2C02::tick() {
 			m_nmi = true;
 	}
 	// ------------------
-
-	SDL_Color rm_pallette[4] = {
-		{0, 0, 0, 255},
-		{100, 50, 0, 255},
-		{50, 100, 0, 255},
-		{0, 50, 100, 255}
-	};
-
-	/*if (m_cycle <= 256 && m_scanline < 240)
-	for (int y = 0; y < 30; y++) {
-		for (int x = 0; x < 32; x++) {
-			m_screenBuffer[m_cycle - 1 + m_scanline * 256] =
-				m_pallette[m_bus->read(0x2000 + y * 32 + x) % 0x40];
-		}
-	}*/
-
-
-	//// Draw Pixel
-	//if (m_cycle <= 256 && m_scanline < 240) {
-	//	m_screenBuffer[m_cycle - 1 + m_scanline * 256] =
-	//		m_pallette[m_bus->read(0x2000 + m_cycle + m_scanline * 32)];
-	//}
-	//// ----------
 	
 
 	// Reset Cycles and Scanlines
@@ -157,15 +139,119 @@ void PPU_2C02::tick() {
 
 
 	if (m_frameComplete) {
+		// Render pattern memory
+		for (int tileY = 0; tileY < 16; tileY++) {
+			for (int tileX = 0; tileX < 16; tileX++) {
+				int offset = tileY * 256 + tileX * 16;
+
+				for (int row = 0; row < 8; row++) {
+					int tile_lsb = readFrom(offset + row + 0);
+					int tile_msb = readFrom(offset + row + 8);
+
+					for (int col = 0; col < 8; col++) {
+						uint8_t pixel = (tile_lsb & 0x01) | ((tile_msb & 0x01) << 1);
+						tile_lsb >>= 1; tile_msb >>= 1;
+
+						m_patternBuffer[tileX * 8 + (7 - col) +
+							(tileY * 8 + row) * 256] = 
+							m_palette[
+								readFrom(0x3F00 + (m_selectedPalette << 2) + pixel)
+							];;
+					}
+				}
+			}
+		}
+
+		for (int tileY = 0; tileY < 16; tileY++) {
+			for (int tileX = 0; tileX < 16; tileX++) {
+				int offset = tileY * 256 + tileX * 16;
+
+				for (int row = 0; row < 8; row++) {
+					int tile_lsb = readFrom(0x1000 + offset + row + 0);
+					int tile_msb = readFrom(0x1000 + offset + row + 8);
+
+					for (int col = 0; col < 8; col++) {
+						uint8_t pixel = (tile_lsb & 0x01) | ((tile_msb & 0x01) << 1);
+						tile_lsb >>= 1; tile_msb >>= 1;
+
+						m_patternBuffer[128 + tileX * 8 + (7 - col) +
+							(tileY * 8 + row) * 256] =
+							m_palette[
+								readFrom(0x3F00 + (m_selectedPalette << 2) + pixel)
+							];
+					}
+				}
+			}
+		}
+		// -------------------------
+
+		
+		// Render nametable memory
+		for (int tileY = 0; tileY < 30; tileY++) {
+			for (int tileX = 0; tileX < 32; tileX++) {
+				int index = tileY * 32 + tileX;
+
+				for (int row = 0; row < 8; row++) {
+					int tile_lsb = readFrom(0x1000 + readFrom(0x2000 + index) * 16 + row + 0);
+					int tile_msb = readFrom(0x1000 + readFrom(0x2000 + index) * 16 + row + 8);
+
+					for (int col = 0; col < 8; col++) {
+						uint8_t pixel = (tile_lsb & 0x01) | ((tile_msb & 0x01) << 1);
+						tile_lsb >>= 1; tile_msb >>= 1;
+						int pos = 0;
+						int shift = 0;
+						if ((tileX & 0x03) < 2 && (tileY & 0x03) < 2) {
+							// top left
+							shift = 0;
+							pos = 0b00000011;
+						}
+						else if ((tileX & 0x03) >= 2 && (tileY & 0x03) < 2) {
+							// top right
+							shift = 2;
+							pos = 0b00001100;
+						}
+						else if ((tileX & 0x03) < 2 && (tileY & 0x03) >= 2) {
+							// bottom left
+							shift = 4;
+							pos = 0b00110000;
+						}
+						else if ((tileX & 0x03) >= 2 && (tileY & 0x03) >= 2) {
+							// bottom right
+							shift = 6;
+							pos = 0b11000000;
+						}
+
+						m_screenBuffer[tileX * 8 + (7 - col) +
+							(tileY * 8 + row) * 256] =
+							m_palette[
+								//		|  base |				palette (from attribute memory)						 | color |
+								readFrom(0x3F00 + (((readFrom(0x23C0 + tileX/4 + (tileY/4)*8) & pos) >> shift) << 2) + pixel)
+							];
+					}
+				}
+			}
+		}
+		// -------------------------
+
+
 		// Poll Events
 		SDL_PollEvent(&m_event);
-		if (m_event.type == SDL_QUIT)
+		if (m_event.type == SDL_QUIT) {
 			m_isRunning = false;
+		}
+		else if (m_event.type == SDL_KEYDOWN) {
+			if (m_event.key.keysym.sym == SDLK_p)
+				++m_selectedPalette &= 0x07;
+		}
 
 		// Render Frame
 		SDL_UpdateTexture(m_screen, NULL, m_screenBuffer, sizeof(SDL_Color) * 256);
 		SDL_RenderCopy(m_renderer, m_screen, NULL, NULL);
 		SDL_RenderPresent(m_renderer);
+
+		SDL_UpdateTexture(m_patternScreen, NULL, m_patternBuffer, sizeof(SDL_Color) * 256);
+		SDL_RenderCopy(m_patternRenderer, m_patternScreen, NULL, NULL);
+		SDL_RenderPresent(m_patternRenderer);
 
 		m_frameComplete = false;
 	}
@@ -174,15 +260,19 @@ void PPU_2C02::tick() {
 }
 
 
-uint8_t PPU_2C02::read(uint16_t address) {
+uint8_t PPU_2C02::read(uint16_t address, bool readOnly) {
 	switch(address % m_size) {
 	case 0x0000:	// Control
 		break;
 	case 0x0001:	// Mask
 		break;
 	case 0x0002:	// Status
-		PPU_STATUS.verticalBlank = 0;
-		addressLatch = 0;
+		if (!readOnly) {
+			PPU_STATUS.verticalBlank = 0;
+			addressLatch = 0;
+			PPU_STATUS.verticalBlank = 1;
+		}
+
 
 		//	Return top 3 bits, the rest are residual data
 		return (PPU_STATUS.data & 0xE0) | (dataBuffer & 0x1F);
@@ -196,6 +286,9 @@ uint8_t PPU_2C02::read(uint16_t address) {
 	case 0x0006:	// PPU Address
 		break;
 	case 0x0007:	// PPU Data
+		if (readOnly)
+			return dataBuffer;
+
 		m_tempData = dataBuffer;
 		dataBuffer = readFrom(ppuAddress);
 

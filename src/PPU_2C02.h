@@ -29,14 +29,14 @@ public:
 
 	// From IBusSlave
 	inline const uint16_t size() override { return m_size; }
-	uint8_t read(uint16_t address) override;
+	uint8_t read(uint16_t address, bool readOnly = false) override;
 	void write(uint16_t address, uint8_t data) override;
 	// --------------
 
 private:
 	// From IBusMaster
-	inline uint8_t readFrom(uint16_t address) override {
-		return m_bus->read(address);
+	inline uint8_t readFrom(uint16_t address, bool readOnly = false) override {
+		return m_bus->read(address, readOnly);
 	}
 
 	inline void writeTo(uint16_t address, uint8_t data) override {
@@ -63,14 +63,21 @@ private:
 	SDL_Color*    m_screenBuffer;
 	SDL_Window*	  m_window;
 	SDL_Renderer* m_renderer;
+
+	SDL_Color*	  m_patternBuffer;
+	SDL_Window*	  m_patternWindow;
+	SDL_Renderer* m_patternRenderer;
+	SDL_Texture*  m_patternScreen;
+
 	SDL_Texture*  m_screen;
 	SDL_Event	  m_event;
+	uint8_t		  m_selectedPalette = 0x00;
 	// -------------------
 
 
 	// TODO: Make this modular eventually so that we could
 	// swap out for a different pallette
-	SDL_Color m_pallette[0x40] {
+	SDL_Color m_palette[0x40] {
 		{ 84,  84,  84, 255}, {  0,  30, 116, 255}, {  8,  16, 144, 255}, { 48,   0, 136, 255},
 		{ 68,   0, 100, 255}, { 92,   0,  48, 255}, { 84,   4,   0, 255}, { 60,  24,   0, 255},
 		{ 32,  42,   0, 255}, {  8,  58,   0, 255}, {  0,  64,   0, 255}, {  0,  60,   0, 255},

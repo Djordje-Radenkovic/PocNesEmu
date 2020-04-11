@@ -93,10 +93,11 @@ void CPU_6502::irq() {
 		push(lowByte(PC));
 
 		PS.BC = 1;
+		PS.XX = 1;
 		PS.ID = 1;
 		push(PS.data);
 
-		// readFrom new program counter location from fixed address
+		// Read new program counter location from fixed address
 		uint16_t lo = readFrom(irqVectorLow);
 		uint16_t hi = readFrom(irqVectorHigh);
 		PC = (hi << 8) | lo;
@@ -112,6 +113,7 @@ void CPU_6502::nmi() {
 	push(lowByte(PC));
 
 	PS.BC = 1;
+	PS.XX = 1;
 	PS.ID = 1;
 	push(PS.data);
 

@@ -97,13 +97,13 @@ bool NesMultiMapBus::write(uint16_t address, uint8_t data) {
 }
 
 
-uint8_t NesMultiMapBus::read(uint16_t address) {
+uint8_t NesMultiMapBus::read(uint16_t address, bool readOnly) {
 	// Read from appropriate slave
 	getSlaveWithAddress(address);
 	if (m_tempSlave == nullptr)
 		return -1;
 
-	return m_tempSlave->read(address);
+	return m_tempSlave->read(address, readOnly);
 }
 
 

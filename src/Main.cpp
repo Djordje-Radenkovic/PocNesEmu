@@ -25,8 +25,12 @@ int main(int argc, char** argv) {
 		std::make_shared<NesMultiMapBus>()
 	);
 
-	// Run NesTest
-	nes.nesTest(DK_ROM_FILE_PATH, MEM_DUMP_FILE_PATH, false);
+
+	nes.loadCartridge("./roms/bf.nes");
+	nes.powerOn();
+
+	//// Run NesTest
+	//nes.nesTest(NESTEST_FILE_PATH, MEM_DUMP_FILE_PATH, false);
 
 
 	return 0;

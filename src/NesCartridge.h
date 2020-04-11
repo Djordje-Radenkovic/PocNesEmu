@@ -13,10 +13,11 @@ public:
 	NesCartridge(const char* romFilePath);
 	~NesCartridge();
 
+	bool inline isLoaded() const { return m_isLoaded; }
 
 	// From IBusSlave
 	inline const uint16_t size() override;
-	uint8_t read(uint16_t address) override;
+	uint8_t read(uint16_t address, bool readOnly) override;
 	void write(uint16_t address, uint8_t data) override;
 	// --------------
 
@@ -28,6 +29,8 @@ public:
 	} mirrorMode = HORIZONTAL;
 
 private:
+	bool m_isLoaded = false;
+
 	std::shared_ptr<IMapper> m_mapper;
 	romHeader m_header;
 	uint8_t m_fileType = 0;

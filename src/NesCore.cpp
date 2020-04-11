@@ -74,6 +74,11 @@ bool NesCore::loadCartridge(const char* filePath) {
 	// Construct Cartridge (which also loads file into it)
 	m_cartridge = std::make_shared<NesCartridge>(filePath);
 
+	if (!m_cartridge->isLoaded()) {
+		fmt::print("Failed to load cartrigde!\n");
+		return false;
+	}
+
 	// Connect Cartridge CPU and PPU
 	m_cpuBus->mapSlave(m_cartridge, 0x8000, 0xFFFF);
 	m_ppuBus->mapSlave(m_cartridge, 0x0000, 0x1FFF);
@@ -134,6 +139,11 @@ void NesCore::tick() {
 void NesCore::powerOff() {
 	// Some cleanup here
 	m_isOn = false;
+
+	// Memory dump
+	fmt::print("\n");
+	m_cpuBus->dump_memory("./logs/cpudump.log");
+	m_ppuBus->dump_memory("./logs/ppudump.log");
 }
 
 
@@ -179,7 +189,8 @@ void NesCore::runCPU_nInstructions(size_t nInstructions, uint16_t pc) {
 void NesCore::nesTest(const char* romFilePath, const char* memDumpFilePath,
 	bool noPpu) {
 
-	loadCartridge(romFilePath);
+	if (!loadCartridge(romFilePath))
+		return;
 
 	// Run the CPU
 	if (noPpu)

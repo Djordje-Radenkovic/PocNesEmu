@@ -4,6 +4,7 @@
 
 #include "CPU_6502.h"
 
+
 //#define _DEBUG_LOG
 
 #ifdef _DEBUG_LOG
@@ -19,6 +20,7 @@ void CPU_6502::log() {
 	debugBuffer.clear();
 }
 #endif
+
 
 //	+-----------------------+
 //	|	Addressing Modes	|
@@ -55,11 +57,11 @@ uint8_t CPU_6502::IMM() {
 #ifdef _DEBUG_LOG
 	if (opcode == 0x80 || opcode == 0xEB) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} #${:02X}                      ",
-			opcode, readFrom(addressAbsolute), currentInstructionName, readFrom(addressAbsolute));
+			opcode, readFrom(addressAbsolute, true), currentInstructionName, readFrom(addressAbsolute, true));
 	}
 	else {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} #${:02X}                      ",
-			opcode, readFrom(addressAbsolute), currentInstructionName, readFrom(addressAbsolute));
+			opcode, readFrom(addressAbsolute, true), currentInstructionName, readFrom(addressAbsolute, true));
 	}
 	log();
 #endif
@@ -78,14 +80,14 @@ uint8_t CPU_6502::ZP0() {
 	if (opcode == 0x04 || opcode == 0x44 || opcode == 0x64 || opcode == 0xA7 || opcode == 0x87 ||
 		opcode == 0xC7 || opcode == 0xE7 || opcode == 0x07 || opcode == 0x27 || opcode == 0x47 ||
 		opcode == 0x67) {
-	result = readFrom(PC);
+	result = readFrom(PC, true);
 
 	fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} ${:02X} = {:02X}                  ",
-		opcode, result, currentInstructionName, result, readFrom(result));
+		opcode, result, currentInstructionName, result, readFrom(result, true));
 	}
 	else {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X} = {:02X}                  ",
-			opcode, addressAbsolute, currentInstructionName, addressAbsolute, readFrom(addressAbsolute));
+			opcode, addressAbsolute, currentInstructionName, addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	log();
 #endif
@@ -101,16 +103,16 @@ uint8_t CPU_6502::ZPX() {
 	addressAbsolute &= 0x00FF;
 
 #ifdef _DEBUG_LOG
-	result = readFrom(PC);
+	result = readFrom(PC, true);
 	if (opcode == 0x14 || opcode == 0x34 || opcode == 0x54 || opcode == 0x74 ||
 		opcode == 0xD4 || opcode == 0xF4 || opcode == 0xD7 || opcode == 0xF7 ||
 		opcode == 0x17 || opcode == 0x37 || opcode == 0x57 || opcode == 0x77) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} ${:02X},X @ {:02X} = {:02X}           ",
-			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute));
+			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	else {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X},X @ {:02X} = {:02X}           ",
-			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute));
+			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	log();
 #endif
@@ -126,15 +128,15 @@ uint8_t CPU_6502::ZPY() {
 	addressAbsolute &= 0x00FF;
 
 #ifdef _DEBUG_LOG
-	result = readFrom(PC);
+	result = readFrom(PC, true);
 
 	if (opcode == 0xB7 || opcode == 0x97) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} ${:02X},Y @ {:02X} = {:02X}           ",
-			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute));
+			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	else {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:02X},Y @ {:02X} = {:02X}           ",
-			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute));
+			opcode, result, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	log();
 #endif
@@ -155,7 +157,7 @@ uint8_t CPU_6502::ABS() {
 		opcode == 0xEF || opcode == 0x0F || opcode == 0x2F || opcode == 0x4F ||
 		opcode == 0x6F) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X} *{:s} ${:04X} = {:02X}                ",
-			opcode, lo, hi, currentInstructionName, addressAbsolute, readFrom(addressAbsolute));
+			opcode, lo, hi, currentInstructionName, addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	else if (opcode ==  0x4C || opcode == 0x20) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X}                     ",
@@ -163,7 +165,7 @@ uint8_t CPU_6502::ABS() {
 	}
 	else {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X} = {:02X}                ",
-			opcode, lo, hi, currentInstructionName, addressAbsolute, readFrom(addressAbsolute));
+			opcode, lo, hi, currentInstructionName, addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	log();
 #endif
@@ -188,12 +190,12 @@ uint8_t CPU_6502::ABX() {
 		opcode == 0x5F || opcode == 0x7F) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X} *{:s} ${:04X},X @ {:04X} = {:02X}       ",
 			opcode, lo, hi, currentInstructionName, result,
-			addressAbsolute, readFrom(addressAbsolute));
+			addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	else {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X},X @ {:04X} = {:02X}       ",
 			opcode, lo, hi, currentInstructionName, result,
-			addressAbsolute, readFrom(addressAbsolute));
+			addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	log();
 #endif
@@ -219,11 +221,11 @@ uint8_t CPU_6502::ABY() {
 	if (opcode == 0xBF || opcode == 0xDB || opcode == 0xFB || opcode == 0x1B || opcode == 0x3B ||
 		opcode == 0x5B || opcode == 0x7B) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X} *{:s} ${:04X},Y @ {:04X} = {:02X}       ",
-			opcode, lo, hi, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute));
+			opcode, lo, hi, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	else {
 		fmt::format_to(debugBuffer, "{:02X} {:02X} {:02X}  {:s} ${:04X},Y @ {:04X} = {:02X}       ",
-			opcode, lo, hi, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute));
+			opcode, lo, hi, currentInstructionName, result, addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	log();
 #endif
@@ -275,11 +277,11 @@ uint8_t CPU_6502::IZX() {
 	if (opcode == 0xA3 || opcode == 0x83 || opcode == 0xC3 || opcode == 0xE3 || opcode == 0x03 ||
 		opcode == 0x23 || opcode == 0x43 || opcode == 0x63) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} (${:02X},X) @ {:02X} = {:04X} = {:02X}  ",
-			opcode, result, currentInstructionName, result, lowByte(result + X), addressAbsolute, readFrom(addressAbsolute));
+			opcode, result, currentInstructionName, result, lowByte(result + X), addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	else {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} (${:02X},X) @ {:02X} = {:04X} = {:02X}  ",
-			opcode, result, currentInstructionName, result, lowByte(result + X), addressAbsolute, readFrom(addressAbsolute));
+			opcode, result, currentInstructionName, result, lowByte(result + X), addressAbsolute, readFrom(addressAbsolute, true));
 	}
 	log();
 #endif
@@ -301,11 +303,13 @@ uint8_t CPU_6502::IZY() {
 	if (opcode == 0xA3 || opcode == 0xB3 || opcode == 0xD3 || opcode == 0xF3 || opcode == 0x13 || opcode == 0x33 ||
 		opcode == 0x53 || opcode == 0x73) {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}    *{:s} (${:02X}),Y = {:04X} @ {:04X} = {:02X}",
-			opcode, result, currentInstructionName, result, addressAbsolute, (addressAbsolute + Y) & 0xFFFF, readFrom((addressAbsolute + Y) & 0xFFFF));
+			opcode, result, currentInstructionName, result, addressAbsolute,
+			(addressAbsolute + Y) & 0xFFFF, readFrom((addressAbsolute + Y) & 0xFFFF, true));
 	}
 	else {
 		fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} (${:02X}),Y = {:04X} @ {:04X} = {:02X}",
-			opcode, result, currentInstructionName, result, addressAbsolute, (addressAbsolute + Y) & 0xFFFF, readFrom((addressAbsolute + Y) & 0xFFFF));
+			opcode, result, currentInstructionName, result, addressAbsolute,
+			(addressAbsolute + Y) & 0xFFFF, readFrom((addressAbsolute + Y) & 0xFFFF, true));
 	}
 	log();
 #endif
@@ -331,7 +335,7 @@ uint8_t CPU_6502::REL() {
 
 #ifdef _DEBUG_LOG
 	fmt::format_to(debugBuffer, "{:02X} {:02X}     {:s} ${:04X}                     ",
-		opcode, readFrom(PC), currentInstructionName, (PC+1 + addressRelative) & 0xFFFF);
+		opcode, readFrom(PC, true), currentInstructionName, (PC+1 + addressRelative) & 0xFFFF);
 	log();
 #endif
 

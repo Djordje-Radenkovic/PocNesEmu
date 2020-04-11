@@ -7,10 +7,10 @@
 
 NesCartridge::NesCartridge(const char* romFilePath) {
 	std::ifstream romFile;
-	romFile.open(romFilePath, std::ifstream::binary);
+	romFile.open(romFilePath, std::ifstream::binary | std::ifstream::in);
 
 	if (!romFile.is_open()) {
-		fmt::print("Failed to open ROM file!");
+		fmt::print("Couldn't open ROM file!\n");
 		return;
 	}
 
@@ -33,8 +33,8 @@ NesCartridge::NesCartridge(const char* romFilePath) {
 	// TODO: Implement more file type handlers
 	switch (m_fileType) {
 	case 0:
-		fmt::print("iNES file type 0 not implemented!");
-		break;
+		fmt::print("iNES file type 0 not implemented!\n");
+		return;
 	case 1:
 		// Read PRG memory
 		m_PRGBanks = m_header.prg_rom_chunks;
@@ -49,11 +49,11 @@ NesCartridge::NesCartridge(const char* romFilePath) {
 		romFile.read((char*)m_CHRMemory, m_CHRMemorySize);
 		break;
 	case 2:
-		fmt::print("iNES file type 2 not implemented!");
-		break;
+		fmt::print("iNES file type 2 not implemented!\n");
+		return;
 	default:
-		fmt::print("Unsuported iNES file type!");
-		break;
+		fmt::print("Unsuported iNES file type!\n");
+		return;
 	}
 
 	// Load appropriate mapper
@@ -62,11 +62,11 @@ NesCartridge::NesCartridge(const char* romFilePath) {
 		m_mapper = std::make_shared<Mapper_000>(m_PRGBanks, m_CHRBanks);
 		break;
 	default:
-		fmt::print("Unsuported mapper type!");
-		break;
+		fmt::print("Unsuported mapper type!\n");
+		return;
 	}
 
-
+	m_isLoaded = true;
 	romFile.close();
 }
 
@@ -80,7 +80,7 @@ NesCartridge::~NesCartridge() {
 }
 
 
-uint8_t NesCartridge::read(uint16_t address) {
+uint8_t NesCartridge::read(uint16_t address, bool readOnly) {
 	// PPU Read
 	if (address >= 0x0000 && address <= 0x1FFF)
 		return m_CHRMemory[m_mapper->mapRead(address)];
