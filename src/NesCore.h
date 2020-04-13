@@ -18,6 +18,8 @@ public:
 		std::shared_ptr<IBus<uint16_t, uint8_t>> ppuBus
 	);
 
+	~NesCore();
+
 
 	void nesTest(const char* romFilePath, const char* memDumpFilePath,
 				 bool noPpu = true);
@@ -44,6 +46,10 @@ private:
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_nameTable0;
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_nameTable1;
 	std::shared_ptr<IRam<uint16_t, uint8_t>> m_palletteRam;
+
+	std::shared_ptr<IRam<uint16_t, uint8_t>> m_controller1;
+
+	std::ofstream m_cpuLogFile;
 
 private:
 	void runCPU_nCycles(size_t nCycles);

@@ -21,6 +21,10 @@ public:
 	bool inline getNmi()	override;
 	void inline clearNmi()	override;
 
+	int inline	getCycle()	  override;
+	int inline	getScanline() override;
+
+
 
 	// From IBusMaster
 	void connectBus(std::shared_ptr<IBus<uint16_t, uint8_t>> bus) override;
@@ -58,6 +62,11 @@ private:
 	uint16_t ppuAddress	  = 0x00;
 	uint8_t  addressLatch = 0x00;
 	uint8_t  dataBuffer	  = 0x00;
+
+	uint8_t  m_tile_lsb	  = 0x00;
+	uint8_t  m_tile_msb   = 0x00;
+	uint8_t	 m_pos		  = 0x00;
+	uint8_t	 m_shift	  = 0x00;
 
 	// SDL Rendering Stuff
 	SDL_Color*    m_screenBuffer;

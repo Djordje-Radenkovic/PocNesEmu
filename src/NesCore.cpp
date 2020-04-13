@@ -1,10 +1,12 @@
 #include <fstream>
 #include <iostream>
+#include <string>
 
 #include "fmt/printf.h"
 
 #include "NesCore.h"
 #include "NesCartridge.h"
+#include "Config.h"
 
 
 NesCore::NesCore(
@@ -40,6 +42,24 @@ NesCore::NesCore(
 
 	m_ppuBus->mapSlave(m_palletteRam, 0x3F00, 0x3FFF);
 
+	m_controller1 = std::make_shared<NesArrayRam>(0x2);
+	m_cpuBus->mapSlave(m_controller1, 0x4016);
+
+#ifdef _LOG
+	// Open debug file
+	m_cpuLogFile.open("./logs/cpu.log");
+
+	if (!m_cpuLogFile.is_open())
+		fmt::print("Failed to open cpu.log file!\n");
+#endif
+}
+
+
+NesCore::~NesCore() {
+#ifdef _LOG
+	if (m_cpuLogFile.is_open())
+		m_cpuLogFile.close();
+#endif
 }
 
 
@@ -85,23 +105,23 @@ bool NesCore::loadCartridge(const char* filePath) {
 
 	// Map Nametables based on the mirroring
 	// mode of the cartridge
-	switch (m_cartridge->mirrorMode)
+	switch (m_cartridge->getMirorMode())
 	{
-	case NesCartridge::MIRROR_MODE::VERTICAL:
+	case MIRROR_MODE::VERTICAL:
 		m_ppuBus->mapSlave(m_nameTable0, 0x2000);
 		m_ppuBus->mapSlave(m_nameTable0, 0x2800);
 
 		m_ppuBus->mapSlave(m_nameTable1, 0x2400);
 		m_ppuBus->mapSlave(m_nameTable1, 0x2C00);
 		break;
-	case NesCartridge::MIRROR_MODE::HORIZONTAL:
+	case MIRROR_MODE::HORIZONTAL:
 		m_ppuBus->mapSlave(m_nameTable0, 0x2000, 0x27FF);
 		m_ppuBus->mapSlave(m_nameTable1, 0x8000, 0x2FFF);
 		break;
-	case NesCartridge::MIRROR_MODE::ONE_SCREEN:
+	case MIRROR_MODE::ONE_SCREEN:
 		m_ppuBus->mapSlave(m_nameTable0, 0x2000, 0x2FFF);
 		break;
-	case NesCartridge::MIRROR_MODE::FOUR_SCREEN:
+	case MIRROR_MODE::FOUR_SCREEN:
 		// TODO: Implement this
 		fmt::print("Four screen mirror mode not implemented!");
 		return false;
@@ -116,15 +136,28 @@ bool NesCore::loadCartridge(const char* filePath) {
 
 
 void NesCore::tick() {
+	if (m_totalCyclesPassed % 3 == 0) {
+#ifdef _LOG
+		std::string line = m_cpu->getLog();
+
+		if (line.length() > 3) {
+			line.replace(79, 3, fmt::sprintf("%3d", m_ppu->getCycle()));
+			line.replace(83, 3, fmt::sprintf("%3d", m_ppu->getScanline()));
+
+			fmt::print(line);
+			fmt::fprintf(m_cpuLogFile, line);
+		}
+#endif
+		m_cpu->tick();
+	}
+
 	// PPU clocks 3 times faster than the CPU
 	m_ppu->tick();
-	if (m_totalCyclesPassed % 3 == 0)
-		m_cpu->tick();
 
 	// Interrupt CPU if needed
 	if (m_ppu->getNmi()) {
-		m_ppu->clearNmi();
 		m_cpu->nmi();
+		m_ppu->clearNmi();
 	}
 
 	m_totalCyclesPassed++;
@@ -132,13 +165,16 @@ void NesCore::tick() {
 	// If some component isn't running
 	// stop the NES
 	if (!m_ppu->isRunning())
-		powerOff();
+		m_isOn = false;
 }
 
 
 void NesCore::powerOff() {
 	// Some cleanup here
 	m_isOn = false;
+
+	// Close files
+	m_cpuLogFile.close();
 
 	// Memory dump
 	fmt::print("\n");
@@ -192,14 +228,15 @@ void NesCore::nesTest(const char* romFilePath, const char* memDumpFilePath,
 	if (!loadCartridge(romFilePath))
 		return;
 
-	// Run the CPU
-	if (noPpu)
-		runCPU_nCycles(26554, 0xC000);		// NESTest runs for 26554 cycles
-	else									// starting from address $C000
-		powerOn();
+	m_isOn = true;
 
-	// Memory dump
-	fmt::print("\n");
-	m_cpuBus->dump_memory(memDumpFilePath);
-	m_ppuBus->dump_memory("./logs/ppudump.log");
+	m_totalCyclesPassed = 0;
+	m_cpu->reset(0xC000);
+	m_ppu->reset();
+
+
+	while (m_cpu->getCyclesPassed() <= 26555)
+		tick();
+
+	powerOff();
 }

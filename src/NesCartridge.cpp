@@ -3,6 +3,8 @@
 #include "fmt/printf.h"
 
 #include "NesCartridge.h"
+#include "Mapper_000.h"
+#include "Mapper_002.h"
 
 
 NesCartridge::NesCartridge(const char* romFilePath) {
@@ -22,9 +24,8 @@ NesCartridge::NesCartridge(const char* romFilePath) {
 	if (m_header.mapper1 & 0x04)
 		romFile.seekg(512, std::ios_base::cur);
 
-	// Set mapper and mirroring information
+	// Set mapper information
 	m_mapperID = ((m_header.mapper2 >> 4) << 4 | (m_header.mapper1 >> 4));
-	mirrorMode = (m_header.mapper1 & 0x01) ? VERTICAL : HORIZONTAL;
 
 	// Get type of iNES file
 	// TODO: Do this instead of hard coding 1
@@ -61,9 +62,21 @@ NesCartridge::NesCartridge(const char* romFilePath) {
 	case 0:
 		m_mapper = std::make_shared<Mapper_000>(m_PRGBanks, m_CHRBanks);
 		break;
+	case 2:
+		m_mapper = std::make_shared<Mapper_002>(m_PRGBanks, m_CHRBanks);
+		break;
 	default:
 		fmt::print("Unsuported mapper type!\n");
 		return;
+	}
+
+	// Set mirroring mode
+	m_mirrorMode = m_mapper->getMirrorMode();
+	if (m_mirrorMode == MIRROR_MODE::SOLDERED)
+		m_mirrorMode = (m_header.mapper1 & 0x01) ?
+		MIRROR_MODE::VERTICAL : MIRROR_MODE::HORIZONTAL;
+	else {
+		fmt::print("Mirror mode is programable!\n");
 	}
 
 	m_isLoaded = true;
@@ -107,3 +120,7 @@ inline const uint16_t NesCartridge::size() {
 	return 0;
 }
 
+
+MIRROR_MODE NesCartridge::getMirorMode() {
+	return m_mirrorMode;
+}

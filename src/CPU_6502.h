@@ -29,15 +29,11 @@
 
 class CPU_6502 final : public INesCpu {
 public:
-	CPU_6502() {}
-	CPU_6502(const char* debugFilePath);
-
-	~CPU_6502();
-
 	void connectBus(std::shared_ptr<IBus<uint16_t, uint8_t>> bus) override;
 
 	inline const size_t getCyclesPassed() override { return totalCyclesPassed; }
 	bool isFinished() override;
+	std::string getLog() override;
 
 	void reset(uint16_t pc) override;
 	void reset() override;
@@ -135,11 +131,12 @@ private:
 	uint8_t opcode = 0x00;
 	uint8_t cycles = 0;
 	size_t totalCyclesPassed = 0;
-	std::ofstream m_debugFile;
+
 
 	static std::vector<CpuInstruction> lookup;
 
 	std::string currentInstructionName;
 	fmt::memory_buffer debugBuffer;
+	fmt::memory_buffer logBuffer;
 	void log();
 };

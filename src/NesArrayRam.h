@@ -8,8 +8,7 @@ public:
 	NesArrayRam(uint16_t size) : m_size(size) {
 		m_data = new uint8_t[m_size];
 
-		for (int i = 0; i < m_size; i++)
-			m_data[i] = 0;
+		std::memset(m_data, 0, m_size);
 	}
 
 	~NesArrayRam() {

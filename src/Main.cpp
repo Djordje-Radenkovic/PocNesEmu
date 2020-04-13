@@ -18,19 +18,17 @@ int main(int argc, char** argv) {
 
 	// Create the system instance
 	NesCore nes(
-		std::make_shared<CPU_6502>(DEBUG_FILE_PATH),
+		std::make_shared<CPU_6502>(),
 		std::make_shared<PPU_2C02>(),
 		std::make_shared<NesArrayRam>(0x0800),
 		std::make_shared<NesMultiMapBus>(),
 		std::make_shared<NesMultiMapBus>()
 	);
 
+	//nes.nesTest(NESTEST_FILE_PATH, MEM_DUMP_FILE_PATH);
 
-	nes.loadCartridge("./roms/bf.nes");
+	nes.loadCartridge("./roms/games/dk.nes");
 	nes.powerOn();
-
-	//// Run NesTest
-	//nes.nesTest(NESTEST_FILE_PATH, MEM_DUMP_FILE_PATH, false);
 
 
 	return 0;

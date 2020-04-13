@@ -5,7 +5,7 @@
 #include "IBusSlave.h"
 #include "NesRom.h"
 
-#include "Mapper_000.h"
+#include "IMapper.h"
 
 
 class NesCartridge : public IBusSlave<uint16_t, uint8_t> {
@@ -14,6 +14,7 @@ public:
 	~NesCartridge();
 
 	bool inline isLoaded() const { return m_isLoaded; }
+	MIRROR_MODE getMirorMode();
 
 	// From IBusSlave
 	inline const uint16_t size() override;
@@ -21,17 +22,11 @@ public:
 	void write(uint16_t address, uint8_t data) override;
 	// --------------
 
-	enum MIRROR_MODE {
-		VERTICAL,
-		HORIZONTAL,
-		ONE_SCREEN,
-		FOUR_SCREEN
-	} mirrorMode = HORIZONTAL;
-
 private:
 	bool m_isLoaded = false;
 
 	std::shared_ptr<IMapper> m_mapper;
+	MIRROR_MODE m_mirrorMode;
 	romHeader m_header;
 	uint8_t m_fileType = 0;
 

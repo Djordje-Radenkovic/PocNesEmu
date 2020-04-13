@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="src\IMapper.h" />
     <ClInclude Include="src\Mapper_000.h" />
+    <ClInclude Include="src\Mapper_002.h" />
     <ClInclude Include="src\NesMultiMapBus.h" />
     <ClInclude Include="src\CPU_6502.h" />
     <ClInclude Include="src\Config.h" />
@@ -37,7 +38,6 @@
     <ClInclude Include="src\NesCore.h" />
     <ClInclude Include="src\NesRom.h" />
     <ClInclude Include="src\PPU_2C02.h" />
-    <ClInclude Include="src\PPU_2C02_Pallette_000.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\fmtlib\src\format.cc" />

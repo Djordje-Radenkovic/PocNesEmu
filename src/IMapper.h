@@ -4,6 +4,15 @@
 #include "fmt/printf.h"
 
 
+enum class MIRROR_MODE {
+	SOLDERED,
+	VERTICAL,
+	HORIZONTAL,
+	ONE_SCREEN,
+	FOUR_SCREEN
+};
+
+
 class IMapper {
 public:
 	IMapper(uint8_t prgBanks, uint8_t chrBanks) : 
@@ -18,7 +27,7 @@ public:
 		if (m_result)
 			return m_mappedAddress;
 
-		fmt::print("MMC failed to map read address!");
+		fmt::print("MMC failed to map read address!\n");
 		return -1;
 	}
 
@@ -31,13 +40,15 @@ public:
 		if (m_result)
 			return m_mappedAddress;
 
-		fmt::print("MMC failed to map write address!");
+		fmt::print("MMC failed to map write address!\n");
 		return -1;
 	}
 
+	virtual MIRROR_MODE getMirrorMode() = 0;
+
 protected:
 	virtual bool cpuRead(uint16_t address) = 0;
-	virtual bool cpuWrite(uint16_t address) = 0;
+	virtual bool cpuWrite(uint16_t address, uint8_t data=0) = 0;
 
 	virtual bool ppuRead(uint16_t address) = 0;
 	virtual bool ppuWrite(uint16_t address) = 0;

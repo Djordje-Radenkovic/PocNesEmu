@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 #include "IBusMaster.h"
 
@@ -14,6 +15,7 @@ public:
 	virtual const inline size_t getCyclesPassed() = 0;
 	virtual void nmi() = 0;
 	virtual void irq() = 0;
+	virtual std::string getLog() = 0;
 
 	virtual ~INesCpu() {}
 

@@ -15,4 +15,6 @@ public:
     virtual bool getNmi()    = 0;
     virtual void clearNmi()  = 0;
 
+    virtual int inline getCycle()    = 0;
+    virtual int inline getScanline() = 0;
 };
